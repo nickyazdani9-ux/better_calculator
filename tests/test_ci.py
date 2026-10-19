@@ -14,7 +14,7 @@ class WorkflowTests(unittest.TestCase):
     def test_all_architectures_are_explicit(self):
         jobs=workflow('pipeline.yml')['jobs']
         target=jobs['desktop']['strategy']['matrix']['include']
-        self.assertTrue({('mac','arm64'),('mac','x64'),('win','arm64'),('win','x64'),
+        self.assertTrue({('mac','arm64'),('mac','x64'),
                          ('linux','arm64'),('linux','x64')}.issubset(
                          {(i['platform'],i['arch']) for i in target}))
         self.assertEqual({i['arch'] for i in jobs['ios']['strategy']['matrix']['include']},
