@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b111d" />
+  <meta name="description" content="An extensible symbolic calculator for calculus, complex analysis, differential geometry and more." />
+  <title>Calculator 2.0 — SymPy CAS</title>
+  <link rel="icon" type="image/png" href="./icons/192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">∂</div>
+        <div><strong>Calculator <span>2.0</span></strong><small>Symbolic mathematics, everywhere.</small></div>
+      </div>
+      <div class="toolbar">
+        <button id="history-toggle" class="icon-btn" aria-label="Calculation history" title="History">◷</button>
+        <label class="theme-picker"><span class="sr-only">Colour theme</span><select id="theme" aria-label="Colour theme"><option value="midnight">Midnight</option><option value="light">Light</option><option value="violet">Violet</option><option value="forest">Forest</option></select></label>
+      </div>
+    </header>
+    <section class="intro">
+      <p class="eyebrow">A REAL COMPUTER ALGEBRA SYSTEM</p>
+      <h1>Mathematics without limits<span class="accent-dot">.</span></h1>
+      <p>Ordinary arithmetic, tensors, transforms, complex functions. One calculator, expandable into anything.</p>
+    </section>
+    <main class="workspace">
+      <div class="section-heading"><span>MATHEMATICAL DOMAINS</span><span class="short-rule"></span><span class="pill">Plugin-powered</span></div>
+      <nav id="tabs" role="tablist" aria-label="Mathematical domains" class="tabs"></nav>
+      <div class="workspace-grid">
+        <section class="editor-card" aria-label="Calculator editor">
+          <div class="panel-head"><div><p class="eyebrow">WORKSPACE / <span id="domain-title">Calculator</span></p><h2>Expression editor</h2></div><span class="count-pill" id="domain-count">Loading</span></div>
+          <form id="calculator-form">
+            <label for="operation" class="field-label">Operation</label>
+            <div class="select-wrap"><select id="operation"></select></div>
+            <p id="operation-description" class="op-description">Choose an operation.</p>
+            <div id="fields" class="fields"></div>
+            <div class="symbols-heading"><span>SYMBOL PALETTE</span><span>Tap to insert</span></div>
+            <div id="symbols" class="symbol-palette"></div>
+            <div class="action-bar"><button id="clear" type="button" class="btn btn-secondary">Reset fields</button><button id="run" type="submit" class="btn btn-primary" disabled><span aria-hidden="true">=</span><span id="run-caption">Loading engine…</span><span aria-hidden="true">↗</span></button></div>
+          </form>
+        </section>
+        <aside class="output-column">
+          <section id="result-section" class="result-card empty" aria-label="Calculation output">
+            <div class="result-header"><div><p class="eyebrow">SYMBOLIC OUTPUT</p><h2>Result</h2></div><button id="copy" class="copy-btn" type="button" disabled>Copy</button></div>
+            <p id="result-state" class="result-state">Ready for a calculation</p>
+            <div id="result-math" class="result-math" aria-hidden="true"></div>
+            <pre id="result-text" class="result-text">Your result will appear here.</pre>
+            <div id="result-lines" class="result-lines"></div>
+          </section>
+          <section class="status-card"><div class="status-row"><div class="engine-info"><span id="engine-indicator" class="status-dot" data-state="loading"></span><div><strong id="engine-label">Initializing CAS</strong><p id="engine-details">Preparing Python in your browser…</p></div></div><span class="status-tag">LOCAL ENGINE</span></div><div class="status-footer"><span>SymPy + Pyodide</span><span>Runs on your device</span></div></section>
+          <section class="about-card"><p class="eyebrow">WHY CALCULATOR 2.0</p><h3>Designed to grow with you.</h3><p>Operations and even whole mathematical domains are registered as independent Python plugins. Add new tabs without rewriting the interface.</p><button id="install" class="btn btn-secondary" type="button" hidden>Install as app</button><p id="install-note" class="tiny">Install from your browser menu once published over HTTPS.</p></section>
+        </aside>
+      </div>
+    </main>
+    <footer>Calculator 2.0 <span>·</span> Local-first symbolic computing <span>·</span> Built for extensibility</footer>
+  </div>
+  <aside id="history-panel" class="history-panel" aria-label="Recent calculations"><div class="history-top"><h2>History</h2><button id="history-close" class="icon-btn" aria-label="Close history">×</button></div><div id="history-items"></div><button id="history-clear" type="button" class="btn btn-secondary">Clear history</button></aside>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" async></script>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

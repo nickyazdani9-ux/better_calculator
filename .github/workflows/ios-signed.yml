@@ -1,0 +1,93 @@
+name: Build signed iOS IPA (optional)
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing source tag, such as v0.2.0
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  ios-ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.13'}
+      - uses: maxim-lobanov/setup-xcode@v1
+        with: {xcode-version: '26.0'}
+      - name: Validate Apple signing settings
+        env:
+          CERT_B64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          PROFILE_B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          BUNDLE_ID: ${{ secrets.IOS_BUNDLE_ID }}
+        shell: bash
+        run: |
+          test -n "$CERT_B64" && test -n "$CERT_PASSWORD" && test -n "$PROFILE_B64" && test -n "$TEAM_ID" && test -n "$BUNDLE_ID" || { echo 'Missing Apple signing secrets' >&2; exit 1; }
+          printf '%s' "$CERT_B64" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          printf '%s' "$PROFILE_B64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          echo "IOS_TEAM=$TEAM_ID" >> "$GITHUB_ENV"
+          echo "IOS_BUNDLE=$BUNDLE_ID" >> "$GITHUB_ENV"
+      - name: Prepare temporary keychain and provisioning profile
+        env:
+          CERT_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+        shell: bash
+        run: |
+          security create-keychain -p buildpass "$RUNNER_TEMP/calculator2.keychain-db"
+          security set-keychain-settings -lut 3600 "$RUNNER_TEMP/calculator2.keychain-db"
+          security unlock-keychain -p buildpass "$RUNNER_TEMP/calculator2.keychain-db"
+          security list-keychains -d user -s "$RUNNER_TEMP/calculator2.keychain-db" login.keychain-db
+          security import "$RUNNER_TEMP/dist.p12" -k "$RUNNER_TEMP/calculator2.keychain-db" -P "$CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k buildpass "$RUNNER_TEMP/calculator2.keychain-db"
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/profile.plist")
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print Name' "$RUNNER_TEMP/profile.plist")
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+          echo "IOS_PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: python scripts/vendor_pyodide.py
+      - run: npm run build:native
+      - name: Apply signed bundle identifier before generating iOS target
+        shell: bash
+        run: |
+          node -e 'const fs=require("fs");const p="capacitor.config.json";const config=JSON.parse(fs.readFileSync(p));config.appId=process.env.IOS_BUNDLE;fs.writeFileSync(p,JSON.stringify(config,null,2));'
+      - run: npx cap add ios
+      - run: npx cap sync ios
+      - name: Archive signed device application
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Calculator2.xcarchive" \
+            DEVELOPMENT_TEAM="$IOS_TEAM" CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$IOS_PROFILE_NAME" \
+            CODE_SIGN_IDENTITY='Apple Distribution' archive
+      - name: Export distributable IPA
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${IOS_TEAM}</string>
+            <key>provisioningProfiles</key><dict><key>${IOS_BUNDLE}</key><string>${IOS_PROFILE_NAME}</string></dict>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Calculator2.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export"
+          mkdir -p ios-ipa
+          cp "$RUNNER_TEMP/export/"*.ipa ios-ipa/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator2-ios-signed-ipa
+          path: ios-ipa/*.ipa
+          retention-days: 7

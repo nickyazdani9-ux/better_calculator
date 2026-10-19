@@ -1,0 +1,947 @@
+[
+  {
+    "id": "basic",
+    "name": "Calculator",
+    "icon": "calculator",
+    "operations": [
+      {
+        "id": "simplify",
+        "label": "Simplify",
+        "description": "Simplify an exact symbolic expression.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "(x^2-1)/(x-1)",
+            "kind": "text",
+            "hint": "Use ^ for powers, * for multiplication"
+          }
+        ]
+      },
+      {
+        "id": "evaluate",
+        "label": "Evaluate",
+        "description": "Evaluate with exact arithmetic.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "1/3 + 1/6",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "approximate",
+        "label": "Decimal",
+        "description": "Numerical approximation.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "pi*sqrt(2)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "digits",
+            "label": "Digits",
+            "default": "12",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "factor",
+        "label": "Factor",
+        "description": "Factor a polynomial.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "x^2-1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "expand",
+        "label": "Expand",
+        "description": "Expand algebraic products.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "(x+1)^3",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "solve",
+        "label": "Solve",
+        "description": "Solve expression = 0 for a variable.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "x^2-4",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "calculus",
+    "name": "Calculus",
+    "icon": "sigma",
+    "operations": [
+      {
+        "id": "differentiate",
+        "label": "Differentiate",
+        "description": "Ordinary or higher derivatives.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(x)",
+            "default": "x^3 + sin(x)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "order",
+            "label": "Derivative order",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "integrate",
+        "label": "Integrate",
+        "description": "Indefinite or definite integral; leave both bounds blank for indefinite.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Integrand",
+            "default": "x^2",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "lower",
+            "label": "Lower bound (optional)",
+            "default": "",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "upper",
+            "label": "Upper bound (optional)",
+            "default": "",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "limit",
+        "label": "Limit",
+        "description": "Two-sided, left, or right limit.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "sin(x)/x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "point",
+            "label": "Approaches",
+            "default": "0",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "direction",
+            "label": "Side: +, -, or +-",
+            "default": "+-",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "series",
+        "label": "Taylor series",
+        "description": "Taylor / Laurent expansion around a point.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "exp(x)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "around",
+            "label": "Around",
+            "default": "0",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "order",
+            "label": "Terms before O(x^n)",
+            "default": "6",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "partial",
+        "label": "Partial derivative",
+        "description": "Differentiate with respect to any variable.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "x^2*y+sin(y)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "With respect to",
+            "default": "y",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "order",
+            "label": "Order",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "ode",
+        "label": "First-order ODE",
+        "description": "Solve dy/dx = f(x,y). Write the right-hand side using y, not y(x).",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "dy/dx =",
+            "default": "y",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Independent variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "gradient",
+        "label": "Gradient",
+        "description": "Gradient of a scalar field in coordinate variables.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Scalar field",
+            "default": "x^2*y+y^2",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variables",
+            "label": "Variables",
+            "default": "x,y",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "hessian",
+        "label": "Hessian",
+        "description": "Matrix of second-order partial derivatives.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Scalar field",
+            "default": "x^2*y+y^2",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variables",
+            "label": "Variables",
+            "default": "x,y",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "jacobian",
+        "label": "Jacobian",
+        "description": "Jacobian of a vector-valued function.",
+        "fields": [
+          {
+            "key": "expressions",
+            "label": "Vector of expressions",
+            "default": "[x*y,x^2+y]",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variables",
+            "label": "Variables",
+            "default": "x,y",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "complex",
+    "name": "Complex analysis",
+    "icon": "orbit",
+    "operations": [
+      {
+        "id": "simplify",
+        "label": "Simplify complex",
+        "description": "Simplify expression with complex variables.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Expression",
+            "default": "(1+I)^2",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "parts",
+        "label": "Real / imaginary",
+        "description": "Extract real, imaginary, modulus, and argument.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "Complex expression",
+            "default": "3+4*I",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "derivative",
+        "label": "Complex derivative",
+        "description": "Formal complex differentiation of an analytic expression.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(z)",
+            "default": "exp(z)*sin(z)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Complex variable",
+            "default": "z",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "residue",
+        "label": "Residue",
+        "description": "Residue at an isolated singularity.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(z)",
+            "default": "1/(z-2)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Complex variable",
+            "default": "z",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "point",
+            "label": "Pole location",
+            "default": "2",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "series",
+        "label": "Laurent series",
+        "description": "Series about a complex point.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(z)",
+            "default": "1/(z-2)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Complex variable",
+            "default": "z",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "point",
+            "label": "Center",
+            "default": "2",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "order",
+            "label": "Series order",
+            "default": "4",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "cauchy_riemann",
+        "label": "Cauchy–Riemann",
+        "description": "Check Cauchy–Riemann conditions symbolically (necessary, not sufficient alone for analyticity).",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(z)",
+            "default": "z^2",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "geometry",
+    "name": "Differential geometry",
+    "icon": "globe",
+    "operations": [
+      {
+        "id": "inverse_metric",
+        "label": "Inverse metric",
+        "description": "Compute g^{ij}.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "determinant",
+        "label": "Metric determinant",
+        "description": "Compute det(g).",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "christoffel",
+        "label": "Christoffel symbols",
+        "description": "Nonzero Γ^a_bc for Levi-Civita connection.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "ricci",
+        "label": "Ricci tensor",
+        "description": "Compute R_ij using R^a_bcd = ∂cΓ^a_db − ∂dΓ^a_cb + ...",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "scalar_curvature",
+        "label": "Scalar curvature",
+        "description": "Compute R = g^{ij}R_ij.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "einstein",
+        "label": "Einstein tensor",
+        "description": "Compute G_ij = R_ij − (R/2) g_ij.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      },
+      {
+        "id": "riemann_component",
+        "label": "Riemann component",
+        "description": "Compute R^a_{bcd} for 0-based index values.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          },
+          {
+            "key": "a",
+            "label": "Upper index a (0-based)",
+            "default": "0",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "b",
+            "label": "Index b",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "c",
+            "label": "Index c",
+            "default": "0",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "d",
+            "label": "Index d",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "covariant_derivative",
+        "label": "Covariant derivative",
+        "description": "Compute ∇_k V^i for a contravariant vector.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          },
+          {
+            "key": "vector",
+            "label": "Components V^i",
+            "default": "[0,1]",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "direction",
+            "label": "Differentiate along",
+            "default": "r",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "geodesic",
+        "label": "Geodesic equations",
+        "description": "Display the equations d²xᵃ/dλ² + Γᵃ_bc dxᵇ/dλ dxᶜ/dλ = 0.",
+        "fields": [
+          {
+            "key": "coordinates",
+            "label": "Coordinates (comma-separated)",
+            "default": "r,theta",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "metric",
+            "label": "Metric g_ij",
+            "default": "[[1,0],[0,r^2]]",
+            "kind": "textarea",
+            "hint": "Up to 4 dimensions; symbolic curvature can be computationally expensive."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "waves",
+    "name": "Transforms & waves",
+    "icon": "waves",
+    "operations": [
+      {
+        "id": "fourier",
+        "label": "Fourier transform",
+        "description": "Convention F(k) = ∫ f(x) exp(-2πi kx) dx.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(x)",
+            "default": "exp(-pi*x^2)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Input variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "frequency",
+            "label": "Frequency variable",
+            "default": "k",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "inverse_fourier",
+        "label": "Inverse Fourier",
+        "description": "Inverse with the 2π convention.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "F(k)",
+            "default": "exp(-pi*k^2)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Frequency variable",
+            "default": "k",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "frequency",
+            "label": "Output variable",
+            "default": "x",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "laplace",
+        "label": "Laplace transform",
+        "description": "One-sided Laplace transform.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "f(t)",
+            "default": "exp(-t)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Time variable",
+            "default": "t",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "frequency",
+            "label": "Laplace variable",
+            "default": "s",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "inverse_laplace",
+        "label": "Inverse Laplace",
+        "description": "Inverse one-sided Laplace transform.",
+        "fields": [
+          {
+            "key": "expression",
+            "label": "F(s)",
+            "default": "1/(s+1)",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "variable",
+            "label": "Laplace variable",
+            "default": "s",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "frequency",
+            "label": "Time variable",
+            "default": "t",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "linear",
+    "name": "Linear algebra",
+    "icon": "grid",
+    "operations": [
+      {
+        "id": "determinant",
+        "label": "Determinant",
+        "description": "Exact determinant.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[1,2],[3,4]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "inverse",
+        "label": "Inverse",
+        "description": "Matrix inverse.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[1,2],[3,4]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "transpose",
+        "label": "Transpose",
+        "description": "Transpose a matrix.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[1,2],[3,4]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "eigenvalues",
+        "label": "Eigenvalues",
+        "description": "Eigenvalues and multiplicities.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[2,0],[0,3]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "eigenvectors",
+        "label": "Eigenvectors",
+        "description": "Eigenvectors with algebraic multiplicities.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[2,0],[0,3]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "multiply",
+        "label": "Matrix multiplication",
+        "description": "Multiply A × B.",
+        "fields": [
+          {
+            "key": "matrix",
+            "label": "Matrix",
+            "default": "[[1,2],[3,4]]",
+            "kind": "textarea",
+            "hint": ""
+          },
+          {
+            "key": "other",
+            "label": "Matrix B",
+            "default": "[[5,6],[7,8]]",
+            "kind": "textarea",
+            "hint": ""
+          }
+        ]
+      }
+    ]
+  }
+]

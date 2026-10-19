@@ -1,0 +1,16 @@
+{
+  "id":"./",
+  "name":"Calculator 2.0 — Symbolic Mathematics",
+  "short_name":"Calculator 2.0",
+  "description":"An extensible, local-first SymPy computer algebra system for calculus, differential geometry, complex analysis, transforms and matrices.",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "orientation":"any",
+  "background_color":"#0b101a",
+  "theme_color":"#0b101a",
+  "icons":[
+    {"src":"./icons/192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icons/512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
