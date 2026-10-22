@@ -83,6 +83,83 @@ def parse_math(value):
         raise ValueError('Invalid or excessively large expression.') from e
 
 
+
+def latex_for_input(value):
+    """Typeset the parsed input tree without simplifying the user's original expression.
+
+    Uses precisely the restricted grammar accepted by parse_math; never interprets
+    user input as LaTeX or executes user-supplied Python.
+    """
+    parse_math(value)  # Validate syntax, allowed calls, complexity and limits first.
+    tree = ast.parse(value.replace('^', '**').replace('π', 'pi').replace('∞','oo'), mode='eval')
+
+    def render(node):
+        if isinstance(node, ast.Constant) and type(node.value) in (int, float):
+            return sp.latex(sp.sympify(node.value)), 5
+        if isinstance(node, ast.Name):
+            return sp.latex(CONSTANTS.get(node.id, sp.Symbol(node.id))), 5
+        if isinstance(node, (ast.List, ast.Tuple)):
+            if node.elts and all(isinstance(row, (ast.List, ast.Tuple)) for row in node.elts):
+                rows = [' & '.join(render(element)[0] for element in row.elts) for row in node.elts]
+                return r'\begin{bmatrix}' + r' \\ '.join(rows) + r'\end{bmatrix}', 5
+            return r'\left[' + ', '.join(render(item)[0] for item in node.elts) + r'\right]', 5
+        if isinstance(node, ast.UnaryOp):
+            content, prec = render(node.operand)
+            if prec < 3:
+                content = r'\left(' + content + r'\right)'
+            return ('-' if isinstance(node.op, ast.USub) else '+') + content, 3
+        if isinstance(node, ast.Call):
+            name = node.func.id
+            arg = render(node.args[0])[0]
+            if name == 'sqrt':
+                return r'\sqrt{' + arg + '}', 5
+            if name in ('abs', 'Abs'):
+                return r'\left|' + arg + r'\right|', 5
+            if name == 'conjugate':
+                return r'\overline{' + arg + '}', 5
+            names = {'ln': r'\ln', 'log': r'\log', 'sin': r'\sin', 'cos': r'\cos',
+                     'tan': r'\tan', 'asin': r'\arcsin', 'acos': r'\arccos',
+                     'atan': r'\arctan', 'exp': r'\exp', 'sinh': r'\sinh',
+                     'cosh': r'\cosh', 'tanh': r'\tanh'}
+            label = names.get(name, r'\operatorname{' + name + '}')
+            return label + r'\left(' + arg + r'\right)', 5
+        if isinstance(node, ast.BinOp):
+            left, lp = render(node.left)
+            right, rp = render(node.right)
+            if isinstance(node.op, ast.Pow):
+                if lp < 4 or isinstance(node.left, ast.BinOp) and isinstance(node.left.op, ast.Pow):
+                    left = r'\left(' + left + r'\right)'
+                return left + '^{' + right + '}', 4
+            if isinstance(node.op, ast.Div):
+                return r'\frac{' + left + '}{' + right + '}', 2
+            if isinstance(node.op, ast.Mult):
+                if lp < 2: left = r'\left(' + left + r'\right)'
+                if rp < 2: right = r'\left(' + right + r'\right)'
+                return left + r' \cdot ' + right, 2
+            if isinstance(node.op, (ast.Add, ast.Sub)):
+                if isinstance(node.op, ast.Sub) and (rp <= 1 or isinstance(node.right, ast.UnaryOp)):
+                    right = r'\left(' + right + r'\right)'
+                return left + (' - ' if isinstance(node.op, ast.Sub) else ' + ') + right, 1
+        raise ValueError('Unsupported mathematical input.')
+
+    return render(tree.body)[0]
+
+
+def formatted_inputs(values):
+    """Return structured, safe, typeset versions of the mathematical input fields."""
+    keys = ('expression', 'expressions', 'matrix', 'other', 'metric', 'vector')
+    formatted = []
+    for key in keys:
+        value = values.get(key)
+        if isinstance(value, str) and value.strip():
+            try:
+                formatted.append({'key': key, 'text': value, 'latex': latex_for_input(value)})
+            except ValueError:
+                # Some operations use different input grammars: retain evaluation errors.
+                continue
+    return formatted
+
+
 def math_expr(v, name='expression'):
     return parse_math(v.get(name, ''))
 
@@ -178,7 +255,15 @@ def calculate(request):
         else:
             plain='\n'.join(lines)
             latex=raw.get('latex','')
-        return {'ok':True,'expr':plain,'latex':latex,'text':plain,'lines':lines,'extras':extra}
+        reusable = False
+        if expression is not None:
+            try:
+                parsed_result = parse_math(plain)
+                reusable = isinstance(parsed_result, sp.Expr)
+            except (ValueError, TypeError, OverflowError):
+                pass
+        return {'ok':True,'expr':plain,'latex':latex,'text':plain,'lines':lines,
+                'extras':extra,'inputs':formatted_inputs(values),'reusable':reusable}
     except (ValueError,TypeError,KeyError,ZeroDivisionError,NotImplementedError,sp.PolynomialError) as e:
         return {'ok':False,'error':str(e)}
     except Exception as e:

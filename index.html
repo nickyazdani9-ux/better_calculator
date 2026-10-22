@@ -24,8 +24,8 @@
     </header>
     <section class="intro">
       <p class="eyebrow">A REAL COMPUTER ALGEBRA SYSTEM</p>
-      <h1>Mathematics without limits<span class="accent-dot">.</span></h1>
-      <p>Ordinary arithmetic, tensors, transforms, complex functions. One calculator, expandable into anything.</p>
+      <h1>Write it. Solve it. Keep going<span class="accent-dot">.</span></h1>
+      <p>Enter an expression naturally, press Done, and see the mathematics—not just the code. Save your working as a PDF.</p>
     </section>
     <main class="workspace">
       <div class="section-heading"><span>MATHEMATICAL DOMAINS</span><span class="short-rule"></span><span class="pill">Plugin-powered</span></div>
@@ -40,16 +40,23 @@
             <div id="fields" class="fields"></div>
             <div class="symbols-heading"><span>SYMBOL PALETTE</span><span>Tap to insert</span></div>
             <div id="symbols" class="symbol-palette"></div>
-            <div class="action-bar"><button id="clear" type="button" class="btn btn-secondary">Reset fields</button><button id="run" type="submit" class="btn btn-primary" disabled><span aria-hidden="true">=</span><span id="run-caption">Loading engine…</span><span aria-hidden="true">↗</span></button></div>
+            <div class="action-bar"><button id="clear" type="button" class="btn btn-secondary">Reset fields</button><button id="run" type="submit" class="btn btn-primary" disabled><span aria-hidden="true">✓</span><span id="run-caption">Loading engine…</span><span aria-hidden="true">↗</span></button></div>
           </form>
         </section>
         <aside class="output-column">
           <section id="result-section" class="result-card empty" aria-label="Calculation output">
             <div class="result-header"><div><p class="eyebrow">SYMBOLIC OUTPUT</p><h2>Result</h2></div><button id="copy" class="copy-btn" type="button" disabled>Copy</button></div>
-            <p id="result-state" class="result-state">Ready for a calculation</p>
-            <div id="result-math" class="result-math" aria-hidden="true"></div>
+            <p id="result-state" class="result-state" aria-live="polite">Ready for a calculation</p>
+            <div id="input-typeset" class="typeset-input" hidden><p class="math-caption">YOU ENTERED</p><div id="input-math" class="math-blocks"></div></div>
+            <div class="typeset-answer"><p id="answer-caption" class="math-caption" hidden>RESULT</p><div id="result-math" class="result-math"></div></div>
             <pre id="result-text" class="result-text">Your result will appear here.</pre>
             <div id="result-lines" class="result-lines"></div>
+            <div class="result-actions"><button id="reuse" type="button" class="btn btn-secondary" disabled>Use answer ↗</button><button id="add-step" type="button" class="btn btn-secondary" disabled>Add to worksheet</button><button id="print" type="button" class="btn btn-secondary" disabled>Save as PDF ↗</button></div>
+          </section>
+          <section id="worksheet-card" class="worksheet-card" hidden>
+            <div class="worksheet-header"><div><p class="eyebrow">WORKED EXAMPLE</p><h2>Worksheet <span id="worksheet-count"></span></h2></div><button id="clear-worksheet" type="button" class="copy-btn">Clear</button></div>
+            <div id="worksheet-steps" class="worksheet-steps"></div>
+            <p class="worksheet-note">Add calculations as steps. “Save as PDF” opens your device’s Print / Save as PDF dialog.</p>
           </section>
           <section class="status-card"><div class="status-row"><div class="engine-info"><span id="engine-indicator" class="status-dot" data-state="loading"></span><div><strong id="engine-label">Initializing CAS</strong><p id="engine-details">Preparing Python in your browser…</p></div></div><span class="status-tag">LOCAL ENGINE</span></div><div class="status-footer"><span>SymPy + Pyodide</span><span>Runs on your device</span></div></section>
           <section class="about-card"><p class="eyebrow">WHY CALCULATOR 2.0</p><h3>Designed to grow with you.</h3><p>Operations and even whole mathematical domains are registered as independent Python plugins. Add new tabs without rewriting the interface.</p><button id="install" class="btn btn-secondary" type="button" hidden>Install as app</button><p id="install-note" class="tiny">Install from your browser menu once published over HTTPS.</p></section>

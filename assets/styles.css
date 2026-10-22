@@ -6,3 +6,49 @@
 @media(max-width:760px){.topbar{height:74px}.intro{padding:37px 0 29px}.intro h1{letter-spacing:-1.2px}.workspace-grid{grid-template-columns:1fr}.result-card{min-height:200px}.editor-card{padding:19px}.about-card{display:none}.tabs{margin-right:-16px;padding-right:16px}.section-heading{margin-bottom:13px}.toolbar{gap:6px}.count-pill{font-size:9px}.panel-head{margin-bottom:24px}}
 @media(max-width:370px){.brand small{display:none}.brand strong{font-size:17px}.brand-icon{width:37px;height:37px}.tab{padding:11px 13px}.symbol-palette{grid-template-columns:repeat(6,minmax(0,1fr))}.fields{grid-template-columns:1fr}.action-bar{flex-wrap:wrap}.btn-primary{flex:1}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Typeset result and working sheet: original expression is distinct from the answer. */
+.intro{padding:29px 0 24px}
+.intro h1{font-size:clamp(25px,3vw,37px)}
+.math-caption{font-size:10px;font-weight:750;letter-spacing:1.55px;color:var(--muted);margin:0 0 12px}
+.typeset-input{padding:15px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.math-blocks{display:flex;flex-direction:column;gap:13px}
+.math-block{max-width:100%;overflow-x:auto;padding:3px 1px;font-size:17px}
+.math-field-label{display:block;color:var(--muted2);font-size:11px;margin-bottom:9px}
+.typeset-answer{min-width:0}
+.result-card.has-typeset .result-text{display:none}
+.result-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.result-actions .btn{padding:9px 11px;min-height:37px}
+.worksheet-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;min-width:0;box-shadow:0 12px 32px var(--shadow)}
+.worksheet-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.worksheet-header h2{font-size:19px;margin:7px 0 0}
+#worksheet-count{font-size:12px;color:var(--muted);font-weight:400}
+.worksheet-steps{display:flex;flex-direction:column;gap:16px}
+.worksheet-step{padding:13px;border:1px solid var(--border);background:var(--panel2);border-radius:12px;overflow:hidden}
+.worksheet-step h3{font-size:12px;font-weight:700;margin:0 0 13px}
+.worksheet-step .math-block{font-size:16px}
+.worksheet-step .math-caption{margin:12px 0 8px}
+.worksheet-note{font-size:11px;color:var(--muted);line-height:1.5;margin:16px 0 0}
+@media(max-width:760px){
+  .intro{padding:20px 0 19px}
+  .intro h1{font-size:27px}
+  .result-actions .btn{flex:1 1 auto}
+  .math-block{font-size:15px}
+}
+@media print{
+  @page{margin:16mm;size:auto}
+  :root{color-scheme:light}
+  body,.app-shell{background:white!important;color:black!important;margin:0;padding:0;max-width:none}
+  .topbar,.intro,.section-heading,.tabs,.editor-card,.status-card,.about-card,footer,
+  .history-panel,.result-header button,.result-actions,.worksheet-header button,.worksheet-note{display:none!important}
+  .workspace,.workspace-grid,.output-column{display:block!important;padding:0!important;margin:0!important}
+  .workspace-grid{grid-template-columns:1fr!important}
+  .result-card,.worksheet-card{background:white!important;color:black!important;border:none!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important;padding:0!important}
+  .worksheet-step{border:none!important;border-bottom:1px solid #ccc!important;background:white!important;break-inside:avoid;padding:14px 0!important}
+  .math-caption,.math-field-label,.result-state{color:#555!important}
+  .result-math,.math-block,.worksheet-step{color:black!important;overflow:visible!important}
+  .result-text,.result-line{color:black!important}
+  .result-lines{break-inside:avoid}
+  body.printing-worksheet #result-section{display:none!important}
+  body.printing-single #worksheet-card{display:none!important}
+}
