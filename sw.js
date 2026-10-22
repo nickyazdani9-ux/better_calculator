@@ -1,5 +1,5 @@
 /* Offline app shell + best-effort caching for the separately downloaded CAS runtime. */
-const VERSION='calculator2-shell-v1';
+const VERSION='calculator2-shell-v2';
 const RUNTIME='calculator2-runtime-v1';
 const CORE=['./','./index.html','./manifest.webmanifest','./assets/styles.css','./assets/catalog.json','./src/app.js','./src/registry.js','./src/worker.js','./icons/192.png','./icons/512.png','./python/engine.py','./python/plugins.json','./python/plugins/__init__.py','./python/plugins/basic.py','./python/plugins/calculus.py','./python/plugins/complex_ops.py','./python/plugins/geometry.py','./python/plugins/waves.py','./python/plugins/linear.py'];
 self.addEventListener('install',event=>{
