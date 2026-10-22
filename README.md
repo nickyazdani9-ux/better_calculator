@@ -92,3 +92,20 @@ If additional dependencies are required in Pyodide, amend `scripts/vendor_pyodid
 - Some symbolic expressions may be resource-intensive. There is no hard computation interrupt or memory budget yet.
 
 MIT licensed; see [LICENSE](LICENSE).
+
+## Typeset working and worksheets
+
+Enter ordinary expressions using `^` for powers and `*` for multiplication.
+Press **Done** to evaluate. The result panel shows the original entered
+expression as typeset mathematics, followed by the separately typeset answer.
+The text copy button still copies the exact SymPy result.
+
+Select **Use answer** to put a reusable scalar result into the expression
+field for the next operation. Select **Add to worksheet** to collect multiple
+calculations as a worked example; the worksheet stays available as you switch
+operations and domains. **Save as PDF** opens the browser's Print / Save as
+PDF dialog. This exports the worksheet if it contains steps, otherwise the
+latest result. Explanatory derivation steps are not automatically generated.
+
+The input display is produced from the same restricted expression grammar
+as the evaluator; no user-supplied LaTeX or executable Python is interpreted.
