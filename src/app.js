@@ -132,7 +132,7 @@ function setResult(result){
   panel.dataset.error=String(!result.ok);
   $('#input-typeset').hidden=true;$('#answer-caption').hidden=!result.ok;
   if(!result.ok){pre.textContent=result.error || 'Unknown error';return;}
-  pre.textContent=result.text || '';
+  pre.textContent=result.text;
   const hasInput=fillTypesetInputs(result,inputs)>0;
   $('#input-typeset').hidden=!hasInput;
   const hasAnswer=renderMath(result.latex,math);
