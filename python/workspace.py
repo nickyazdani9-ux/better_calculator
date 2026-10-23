@@ -5,6 +5,8 @@ previous nodes, never expressions reconstructed from displayed result strings.
 No user-provided Python, SymPy sympify strings, or arbitrary functions run.
 """
 from dataclasses import dataclass
+import copy
+import json
 import re
 
 import sympy as sp
@@ -15,6 +17,9 @@ NAME = re.compile(r'[A-Za-z][A-Za-z0-9_]{0,20}\Z')
 NODE_ID = re.compile(r'[a-z][a-z0-9_]{0,31}\Z')
 MAX_NODES = 64
 MAX_BATCH = 24
+MAX_SNAPSHOT_BYTES = 75000
+SNAPSHOT_FORMAT = 'calculator2.workspace'
+SNAPSHOT_VERSION = 1
 SCALARS = frozenset({'scalar', 'scalar_field'})
 ALL_KINDS = frozenset({'scalar', 'scalar_field', 'vector', 'covector', 'matrix', 'tensor2'})
 
@@ -168,6 +173,36 @@ OPERATION_SIGNATURES = {
 class Workspace:
     def __init__(self):
         self.nodes = {}
+        # The journal records *validated requests*, not untrusted SymPy text.
+        # Replaying the journal reproduces typed values and their dependencies.
+        self.journal = []
+
+    @staticmethod
+    def _recordable(request):
+        """Freeze an input command and reject fields outside the versioned protocol."""
+        allowed = {
+            'define': {'command', 'id', 'kind', 'coordinates', 'metric',
+                       'expression', 'components', 'matrix'},
+            'apply': {'command', 'id', 'operation', 'source', 'other', 'variable',
+                      'order', 'point', 'lower', 'upper', 'expression',
+                      'normals', 'independent', 'coordinates', 'mapping'},
+        }
+        cmd = request.get('command')
+        if cmd not in allowed:
+            raise ValueError('Only define/apply commands can be recorded.')
+        if request.get('action', 'workspace') != 'workspace':
+            raise ValueError('Invalid workspace action.')
+        unsupported = set(request) - allowed[cmd] - {'action'}
+        if unsupported:
+            raise ValueError('Unsupported workspace command field: ' + ', '.join(sorted(unsupported)))
+        data = copy.deepcopy({key: value for key, value in request.items() if key != 'action'})
+        try:
+            encoded = json.dumps(data, allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ValueError('Workspace commands must contain JSON-safe values.') from exc
+        if len(encoded) > MAX_SNAPSHOT_BYTES:
+            raise ValueError('Workspace command is too large.')
+        return data
 
     @staticmethod
     def _id(request):
@@ -407,24 +442,60 @@ class Workspace:
         if not isinstance(request, dict):
             raise ValueError('Workspace command must be an object.')
         cmd = request.get('command')
-        if cmd == 'define':
-            return self.define(request)
-        if cmd == 'apply':
-            return self.apply(request)
+        if cmd in ('define', 'apply'):
+            step = self._recordable(request)
+            output = self.define(step) if cmd == 'define' else self.apply(step)
+            self.journal.append(step)
+            return output
         if cmd == 'get':
             return {'ok': True, 'node': self._get(request.get('id')).public()}
         if cmd == 'graph':
             return {'ok': True, 'nodes': [node.public() for node in self.nodes.values()]}
         if cmd == 'operations':
             return {'ok': True, 'operations': {op: sorted(kinds) for op, kinds in OPERATION_SIGNATURES.items()}}
+        if cmd == 'export':
+            snapshot = {'format': SNAPSHOT_FORMAT, 'version': SNAPSHOT_VERSION,
+                        'steps': copy.deepcopy(self.journal)}
+            return {'ok': True, 'snapshot': snapshot}
+        if cmd == 'import':
+            snapshot = request.get('snapshot')
+            if not isinstance(snapshot, dict) or set(snapshot) != {'format', 'version', 'steps'}:
+                raise ValueError('Invalid workspace snapshot structure.')
+            if snapshot['format'] != SNAPSHOT_FORMAT or type(snapshot['version']) is not int or snapshot['version'] != SNAPSHOT_VERSION:
+                raise ValueError('Unsupported workspace snapshot format/version.')
+            steps = snapshot['steps']
+            if not isinstance(steps, list) or len(steps) > MAX_NODES:
+                raise ValueError('Snapshot exceeds the 64-node limit.')
+            try:
+                encoded = json.dumps(snapshot, allow_nan=False)
+            except (TypeError, ValueError) as exc:
+                raise ValueError('Snapshot must be JSON-safe.') from exc
+            if len(encoded) > MAX_SNAPSHOT_BYTES:
+                raise ValueError('Snapshot exceeds the size limit.')
+            before_nodes, before_journal = self.nodes, self.journal
+            self.nodes, self.journal = {}, []
+            try:
+                for index, step in enumerate(steps):
+                    if not isinstance(step, dict) or step.get('command') not in ('define', 'apply'):
+                        raise ValueError(f'Invalid snapshot step {index}: expected define/apply.')
+                    try:
+                        self.command(step)
+                    except Exception as exc:
+                        raise ValueError(f'Invalid snapshot step {index}: {exc}') from exc
+            except Exception:
+                self.nodes, self.journal = before_nodes, before_journal
+                raise
+            return {'ok': True, 'nodes': [node.public() for node in self.nodes.values()]}
         if cmd == 'reset':
             self.nodes.clear()
+            self.journal.clear()
             return {'ok': True, 'nodes': []}
         if cmd == 'batch':
             steps = request.get('steps')
             if not isinstance(steps, list) or not 1 <= len(steps) <= MAX_BATCH:
                 raise ValueError('Batch requires 1–24 steps.')
             before = self.nodes.copy()
+            before_journal = copy.deepcopy(self.journal)
             results = []
             for index, step in enumerate(steps):
                 try:
@@ -433,6 +504,7 @@ class Workspace:
                     results.append(self.command(step))
                 except Exception as exc:
                     self.nodes = before
+                    self.journal = before_journal
                     return {'ok': False, 'failed_step': index, 'error': str(exc)}
             return {'ok': True, 'results': results}
         raise ValueError('Unknown workspace command.')
