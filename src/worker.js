@@ -21,15 +21,17 @@ async function initialize() {
     state('loading','Loading SymPy symbolic engine…');
     await pyodide.loadPackage('sympy');
     state('loading','Registering mathematical extensions…');
-    const [engine, workspace, modManifest, init] = await Promise.all([
+    const [engine, workspace, mathOperations, modManifest, init] = await Promise.all([
       fetch(new URL('../python/engine.py', self.location.href)).then(r => {if(!r.ok) throw Error('Engine download failed'); return r.text();}),
       fetch(new URL('../python/workspace.py', self.location.href)).then(r => {if(!r.ok) throw Error('Workspace download failed'); return r.text();}),
+      fetch(new URL('../python/math_operations.py', self.location.href)).then(r => {if(!r.ok) throw Error('Math operations download failed'); return r.text();}),
       fetch(new URL('../python/plugins.json', self.location.href)).then(r=>r.json()),
       fetch(new URL('../python/plugins/__init__.py', self.location.href)).then(r=>r.text())
     ]);
     pyodide.FS.mkdirTree('/home/pyodide/plugins');
     pyodide.FS.writeFile('/home/pyodide/engine.py',engine);
     pyodide.FS.writeFile('/home/pyodide/workspace.py',workspace);
+    pyodide.FS.writeFile('/home/pyodide/math_operations.py',mathOperations);
     pyodide.FS.writeFile('/home/pyodide/plugins/__init__.py',init);
     const pluginSources = await Promise.all(modManifest.modules.map(async name=>{
       if(!/^[a-z][a-z0-9_]*$/.test(name)) throw Error('Invalid plugin filename');

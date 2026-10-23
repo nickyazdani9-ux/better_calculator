@@ -10,6 +10,7 @@ import json
 import re
 
 import sympy as sp
+import math_operations as core
 
 from engine import parse_math, parse_matrix
 
@@ -167,6 +168,15 @@ OPERATION_SIGNATURES = {
     'raise_index': frozenset({'covector'}),
     'lower_index': frozenset({'vector'}),
     'change_coordinates': frozenset({'scalar_field', 'vector', 'covector', 'tensor2'}),
+    'fourier': frozenset({'scalar'}),
+    'inverse_fourier': frozenset({'scalar'}),
+    'laplace': frozenset({'scalar'}),
+    'inverse_laplace': frozenset({'scalar'}),
+    'limit': frozenset({'scalar'}),
+    'series': frozenset({'scalar'}),
+    'matrix_inverse': frozenset({'matrix'}),
+    'matrix_transpose': frozenset({'matrix'}),
+    'matrix_multiply': frozenset({'matrix'}),
 }
 
 
@@ -185,7 +195,8 @@ class Workspace:
                        'expression', 'components', 'matrix'},
             'apply': {'command', 'id', 'operation', 'source', 'other', 'variable',
                       'order', 'point', 'lower', 'upper', 'expression',
-                      'normals', 'independent', 'coordinates', 'mapping'},
+                      'normals', 'independent', 'coordinates', 'mapping',
+                      'frequency', 'direction'},
         }
         cmd = request.get('command')
         if cmd not in allowed:
@@ -305,6 +316,20 @@ class Workspace:
                 if variable in coords:
                     raise ValueError('Residues require a complex variable, not a real coordinate.')
                 value = sp.residue(value, variable, scalar_expr(request.get('point', '0'), coords))
+        elif op in ('fourier', 'inverse_fourier', 'laplace', 'inverse_laplace',
+                    'limit', 'series'):
+            variable = symbol(request.get('variable'))
+            if op in ('fourier', 'inverse_fourier', 'laplace', 'inverse_laplace'):
+                frequency = symbol(request.get('frequency'))
+                if variable == frequency:
+                    raise ValueError('Transform input and output variables must be distinct.')
+                value = core.transform(op, value, variable, frequency)
+            elif op == 'limit':
+                point = scalar_expr(request.get('point', '0'))
+                value = core.limit(value, variable, point, request.get('direction', '+-'))
+            else:
+                point = scalar_expr(request.get('point', '0'))
+                value = core.series(value, variable, point, request.get('order', 6))
         elif op == 'exterior_derivative':
             if not coords:
                 raise ValueError('The exterior derivative needs a declared coordinate chart.')
@@ -341,6 +366,18 @@ class Workspace:
                 raise ValueError('Determinant requires a square matrix.')
             value = value.det()
             kind = 'scalar_field' if coords else 'scalar'
+        elif op in ('matrix_inverse', 'matrix_transpose', 'matrix_multiply'):
+            if op == 'matrix_inverse':
+                value = core.matrix_inverse(value)
+            elif op == 'matrix_transpose':
+                value = core.matrix_transpose(value)
+            else:
+                other = self._get(request.get('other'))
+                if other.kind != 'matrix':
+                    raise ValueError('Matrix multiplication requires a matrix as the second operand.')
+                coords, metric = self._merge_context(source, other)
+                parents += (other.id,)
+                value = core.matrix_multiply(value, other.value)
         elif op == 'substitute':
             variable = symbol(request.get('variable'))
             if coords and variable.name in {c.name for c in coords}:

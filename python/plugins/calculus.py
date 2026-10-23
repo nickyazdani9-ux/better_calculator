@@ -1,4 +1,5 @@
 import sympy as sp
+from math_operations import limit as shared_limit, series as shared_series
 from engine import register,field,math_expr,math_symbol,math_int
 TAB=('calculus','Calculus','sigma')
 
@@ -18,9 +19,9 @@ def integrate(v):
 def limit(v):
     side=str(v.get('direction','+-')).strip()
     if side not in ('+','-','+-'):raise ValueError('Direction must be +, -, or +-.')
-    return sp.limit(math_expr(v),math_symbol(v),math_expr(v,'point'),dir=side)
+    return shared_limit(math_expr(v),math_symbol(v),math_expr(v,'point'),side)
 @reg('series','Taylor series','Taylor / Laurent expansion around a point.',[field('expression','Expression','exp(x)'),V,field('around','Around','0'),field('order','Terms before O(x^n)','6')])
-def series(v):return sp.series(math_expr(v),math_symbol(v),math_expr(v,'around'),math_int(v,'order',1,18))
+def series(v):return shared_series(math_expr(v),math_symbol(v),math_expr(v,'around'),math_int(v,'order',1,18))
 @reg('partial','Partial derivative','Differentiate with respect to any variable.',[field('expression','Expression','x^2*y+sin(y)'),field('variable','With respect to','y'),field('order','Order','1')])
 def partial(v):return differentiate(v)
 @reg('ode','First-order ODE','Solve dy/dx = f(x,y). Write the right-hand side using y, not y(x).',[field('expression','dy/dx =','y'),field('variable','Independent variable','x')])
