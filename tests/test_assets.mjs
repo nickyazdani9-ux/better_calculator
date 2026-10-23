@@ -29,7 +29,7 @@ test('PWA manifest is installable and assets are cached',()=>{
   assert.ok(manifest.icons.some(icon=>icon.sizes==='192x192'));
   assert.ok(manifest.icons.some(icon=>icon.sizes==='512x512'));
   const worker=read('sw.js');
-  for(const core of ['src/app.js','assets/catalog.json','python/engine.py','python/workspace.py','python/plugins/geometry.py','manifest.webmanifest']) {
+  for(const core of ['src/app.js','assets/catalog.json','src/workspace-storage.js','python/engine.py','python/workspace.py','python/plugins/geometry.py','manifest.webmanifest']) {
     assert.ok(worker.includes(core),`Offline shell missing ${core}`);
   }
 });
