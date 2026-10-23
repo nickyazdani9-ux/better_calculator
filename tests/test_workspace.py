@@ -91,6 +91,15 @@ def test_probabilistic_assumptions_are_explicit():
     assert not out['ok'] and 'independent' in out['error']
 
 
+def test_unscoped_symbols_not_mistaken_for_real_coordinates():
+    workspace = Workspace()
+    workspace.define({'id': 'field', 'expression': 'x', 'coordinates': ['x']})
+    workspace.define({'id': 'symbol', 'expression': 'x'})
+    out = workspace.handle({'command': 'apply', 'id': 'sum', 'source': 'field',
+                            'other': 'symbol', 'operation': 'add'})
+    assert not out['ok'] and 'assumptions' in out['error']
+
+
 def test_workspace_json_boundary_and_legacy_calculator():
     assert json.loads(run_json(json.dumps({'action': 'workspace',
                                           'command': 'reset'})))['ok']
