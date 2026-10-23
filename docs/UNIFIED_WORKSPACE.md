@@ -100,14 +100,57 @@ The batch rolls back its newly added nodes if any step fails. Limits are
 64 nodes per worker, 24 steps per batch, 4 dimensions for coordinate objects,
 and the existing guarded expression parser's complexity limits.
 
+## Coordinate changes and rank-two tensors (next engine slice)
+
+The kernel now supports the following additional operations:
+
+- **change_coordinates** on scalar fields, vectors, covectors and rank-two tensors.
+  Pass a new coordinate list and a **mapping of old coordinates as functions of
+  new coordinates**, e.g. from Cartesian \`x,y\` to polar \`r,theta\` use
+  \`["r*cos(theta)", "r*sin(theta)"]\`. This performs the Jacobian-based
+  transformation of components and the metric, including mixed tensor
+  variance. It requires a square Jacobian with nonzero symbolic determinant.
+  This validates local invertibility **at regular points**, not at singular
+  chart boundaries (e.g. polar coordinates at \`r=0\`).
+- **raise_index** and **lower_index** map covectors/vectors using the
+  explicitly declared metric and its inverse.
+- **pair** evaluates the canonical (bilinear, not Hermitian) dual pairing
+  between a vector and a covector.
+- **tensor_product** combines two vectors/covectors into a rank-two tensor,
+  recording whether each index is upper or lower.
+- **contract** traces a rank-two tensor only if it has one upper and one
+  lower index. Other contractions need an explicit metric operation.
+
+Example (each object has a prior node ID):
+
+~~~json
+{
+  "action": "workspace",
+  "command": "batch",
+  "steps": [
+    {"command": "define", "id": "v", "kind": "vector",
+     "components": "[x,y]", "coordinates": ["x","y"],
+     "metric": "[[1,0],[0,1]]"},
+    {"command": "apply", "id": "polar_v", "source": "v",
+     "operation": "change_coordinates",
+     "coordinates": ["r","theta"],
+     "mapping": ["r*cos(theta)", "r*sin(theta)"]}
+  ]
+}
+~~~
+
+The transformed vector has components \`[r,0]\` in polar coordinates.
+Changing coordinates is not changing the underlying geometric object.
+
 ## Explicit limits and next work
 
 This is a **kernel foundation, not a full mathematical unification**.
 
-- No abstract manifolds, charts and change-of-basis maps yet.
-- No general tensor index algebra, tensor products, pullbacks or covariant
-  derivatives in the unified operation layer; the existing geometry plugin
-  remains independently available.
+- Coordinate changes now work for local charts with explicit invertible maps; global manifolds, chart atlases, composition of chart maps, and domain-aware chart validation are not implemented.
+- Rank-two vector/covector tensor products and mixed-index traces are supported,
+  but general tensor ranks, arbitrary contractions, pullbacks of higher forms,
+  Christoffel connections and covariant derivatives are not yet available in
+  the unified operation layer; the existing geometry plugin remains available.
 - Probability currently supports independent normal substitutions and an
   expectation operation. Correlated variables, measures, and explicit
   distribution nodes will require richer typed contexts.
