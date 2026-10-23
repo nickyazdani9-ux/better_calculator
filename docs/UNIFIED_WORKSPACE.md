@@ -14,8 +14,9 @@ via the existing calculate message:
 - New requests: {"action":"workspace","command":"..."}
 
 Nodes live in memory in the Python interpreter owned by the worker. The caller
-can use separate requests or send an **atomic batch**. Restarting or resetting
-the worker removes workspace nodes. Nothing is yet persisted in the browser.
+can use separate requests or send an **atomic batch**. Restarting or resetting the worker removes workspace nodes **unless a previously
+exported versioned JSON snapshot is imported again**. The engine supports
+validated snapshots, but no automatic browser-side persistence has been wired up.
 
 ## Node contracts
 
@@ -91,7 +92,7 @@ Result: the graph represents the field, 1-form, squared norm
 8(x² + y²), and expectation **16**. Here x and y are independent
 standard normal variables when computing the expectation.
 
-Commands: define, apply, get, graph, operations, reset, batch. Every successful
+Commands: define, apply, get, graph, operations, reset, batch, export, import. Every successful
 define/apply response has a node object containing id, kind, expression for
 display, LaTeX, parents and context. Unsupported operations return a structured
 error instead of silently stripping the object's type.
@@ -99,6 +100,33 @@ error instead of silently stripping the object's type.
 The batch rolls back its newly added nodes if any step fails. Limits are
 64 nodes per worker, 24 steps per batch, 4 dimensions for coordinate objects,
 and the existing guarded expression parser's complexity limits.
+
+## Exporting and restoring a complete workflow
+
+The `export` command returns a JSON-safe snapshot of the **validated command
+history**, not a lossy string rendering of its final objects:
+
+~~~json
+{"action": "workspace", "command": "export"}
+~~~
+
+Save the returned `snapshot` as JSON. To restore it into a fresh engine,
+send:
+
+~~~json
+{"action": "workspace", "command": "import", "snapshot": {"format": "calculator2.workspace", "version": 1, "steps": []}}
+~~~
+
+Replace the empty `steps` with the exact exported steps. Import replays
+every step through the guarded calculator grammar. It restores object kinds,
+source-node relationships, coordinate charts, metrics and mathematical values
+from the original mathematical commands. The previous workspace is replaced
+**only if the full replay succeeds**; failure leaves it intact. Snapshots are
+limited by schema version, size and node count. An export is detached from the
+engine state so subsequent caller changes cannot mutate the saved graph.
+
+**Not yet implemented:** automatic saving to browser localStorage/IndexedDB,
+UI controls for selecting stored workspaces, or version migrations beyond v1.
 
 ## Coordinate changes and rank-two tensors (next engine slice)
 
@@ -154,11 +182,10 @@ This is a **kernel foundation, not a full mathematical unification**.
 - Probability currently supports independent normal substitutions and an
   expectation operation. Correlated variables, measures, and explicit
   distribution nodes will require richer typed contexts.
-- No stable persistent graph storage or graph-to-UI projection yet.
+- JSON snapshot export/import is implemented, but automatic browser storage and graph-to-UI projection are not yet connected.
 - Only real symmetric metrics with provably real components are supported.
 - Computation limits on expressions do not provide a hard wall-clock timeout.
 
 Future work should add explicit coordinate transforms, tensor types with
-variance/shape, distribution objects and measure context, then introduce
-workflow import/export and persistent graph evaluation. The UI should be built
+variance/shape, distribution objects and measure context, then connect versioned snapshots to durable browser storage and graph evaluation. The UI should be built
 on top of these contracts rather than duplicating discipline-specific logic.
