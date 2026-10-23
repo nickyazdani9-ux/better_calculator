@@ -18,7 +18,7 @@ export function validWorkspaceSnapshot(value) {
       value.format !== 'calculator2.workspace' || value.version !== 1 ||
       !Array.isArray(value.steps) || value.steps.length > MAX_STEPS) return false;
   return value.steps.every(step => {
-    if (!plain(step) || !(step.command in FIELDS) ||
+    if (!plain(step) || !Object.hasOwn(FIELDS, step.command) ||
         typeof step.id !== 'string' || !/^[a-z][a-z0-9_]{0,31}$/.test(step.id)) return false;
     return Object.keys(step).every(key => FIELDS[step.command].has(key));
   });
