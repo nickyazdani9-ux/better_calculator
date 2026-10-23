@@ -100,6 +100,16 @@ def test_unscoped_symbols_not_mistaken_for_real_coordinates():
     assert not out['ok'] and 'assumptions' in out['error']
 
 
+def test_distribution_parameters_cannot_depend_on_random_variables():
+    workspace = Workspace()
+    workspace.define({'id': 'f', 'expression': 'x^2+y^2'})
+    out = workspace.handle({'command': 'apply', 'id': 'mean', 'source': 'f',
+                            'operation': 'expectation', 'independent': True,
+                            'normals': {'x': {'mean': 'y', 'std': '1'},
+                                        'y': {'mean': '0', 'std': '1'}}})
+    assert not out['ok'] and 'parameters' in out['error']
+
+
 def test_workspace_json_boundary_and_legacy_calculator():
     assert json.loads(run_json(json.dumps({'action': 'workspace',
                                           'command': 'reset'})))['ok']
