@@ -46,14 +46,37 @@ async function initialize() {
   return initializing;
 }
 self.addEventListener('message',async event=>{
-  const {type,id,payload} = event.data || {};
-  if(type==='init') { try {await initialize();}catch{} return; }
+  const {type,id,payload,snapshot} = event.data || {};
+  if(type==='init') {
+    try {
+      await initialize();
+      if(snapshot) {
+        pyodide.globals.set('request_payload_json',JSON.stringify({
+          action:'workspace',command:'import',snapshot
+        }));
+        const response=JSON.parse(pyodide.runPython('run_json(request_payload_json)'));
+        if(!response.ok)self.postMessage({type:'workspace-restore-error',error:response.error});
+      }
+    } catch(error) {
+      self.postMessage({type:'workspace-restore-error',error:String(error.message||error)});
+    }
+    return;
+  }
   if(type!=='calculate')return;
   try {
     await initialize();
     pyodide.globals.set('request_payload_json',JSON.stringify(payload));
     const result=pyodide.runPython('run_json(request_payload_json)');
-    self.postMessage({type:'response',id,result:JSON.parse(result)});
+    const parsed=JSON.parse(result);
+    if(parsed.ok && payload?.action==='workspace' &&
+       ['define','apply','batch','import','reset'].includes(payload.command)){
+      pyodide.globals.set('request_payload_json',JSON.stringify({
+        action:'workspace', command:'export'
+      }));
+      const exported=JSON.parse(pyodide.runPython('run_json(request_payload_json)'));
+      if(exported.ok)self.postMessage({type:'workspace-snapshot',snapshot:exported.snapshot});
+    }
+    self.postMessage({type:'response',id,result:parsed});
   } catch(error) {
     self.postMessage({type:'response',id,result:{ok:false,error:`Engine error: ${error.message || error}`}});
   }
