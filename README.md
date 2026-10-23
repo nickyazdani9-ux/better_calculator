@@ -1,5 +1,18 @@
 # Calculator 2.0
 
+## Documentation — start here
+
+New to the calculator? Follow the [documentation index](docs/README.md).
+It provides a five-minute [getting started guide](docs/GETTING_STARTED.md),
+[mathematical concepts](docs/CONCEPTS.md), a full [unified API reference](docs/API.md),
+a [generated reference of all legacy tab operations](docs/LEGACY_API.md),
+and [executable cross-domain recipes](docs/RECIPES.md).
+
+The unified workspace currently has an **experimental, engine-only API**;
+the existing tabbed UI still uses the legacy API. Documentation and examples
+are tested with the code and will continue evolving.
+
+
 **Extensible SymPy computer algebra system** with local execution and builds for web, Android, iOS, macOS, Windows and Linux. Built from the original Calculator 2.0 PWA, preserving the tab/plugin architecture and themes.
 
 ## Current mathematical tabs

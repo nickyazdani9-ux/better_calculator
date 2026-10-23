@@ -1,5 +1,9 @@
 # Calculator 2.0 architecture
 
+For readers new to the project, start at the [documentation index](README.md).
+The [API reference](API.md) is the authoritative current workspace contract.
+
+
 ```
 python/plugins/*.py   -- catalog exporter --> assets/catalog.json
           |                                    |

@@ -1,5 +1,11 @@
 # Unified mathematical workspace (engine API, first iteration)
 
+> These are evolving design and implementation notes. For **current beginner guidance
+> and exact operation contracts**, see the [documentation index](README.md)
+> and [API reference](API.md). Some earlier descriptions below reflect
+> historical implementation stages.
+
+
 The calculator now has a **single, opt-in, typed mathematical graph** alongside its
 existing tab-based operations. No UI changes are required to use this protocol.
 The aim is to make mathematical *objects* composable independently of which
