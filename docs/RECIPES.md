@@ -54,6 +54,21 @@ Assuming *independent standard-normal* X and Y, its expectation is **16**.
 
 **Key idea:** Mathematical context is explicit. This is only one example among indefinitely many potential compatible chains.
 
+## D. Transforms → linear algebra → transforms
+
+Begin with the Gaussian `f(x)=exp(-pi*x^2)`, whose Fourier transform under the
+2π convention is `exp(-pi*k^2)`. In a separate branch, obtain the determinant
+of the diagonal matrix `[[2,0],[0,1]]`. Multiply the spectrum by this scalar
+determinant and apply the inverse Fourier transform.
+
+The recovered function is `2*exp(-pi*x^2)`. Every intermediate result is
+a reusable, typed graph node with parent references.
+
+[Run the exact JSON example](examples/transform_linear_calculus.json).
+
+**Key idea:** Operations from different subjects can occur in any meaningful
+order; no special-case “Fourier → matrix” workflow was implemented.
+
 ## Invalid compositions are important too
 
 For contrast, taking `norm_squared` without a metric, adding tensor components expressed in incompatible charts, or contracting a tensor with two upper indices must return an error. **Rejecting invalid mathematics is part of the contract.** See [Troubleshooting](TROUBLESHOOTING.md).

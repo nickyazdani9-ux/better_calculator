@@ -13,6 +13,19 @@ We write for readers who know mathematics but may be new to this calculator, Pyt
 
 The documentation test checks local links, JSON examples against the real workspace, operation-name coverage against `OPERATION_SIGNATURES`, and the generated legacy reference against the operation catalog.
 
+## Shared legacy/unified implementations
+
+When migrating an existing tab operation into the unified graph, place its
+symbolic mathematical implementation in `python/math_operations.py` (or a
+suitably shared mathematical module). The original plugin and the typed
+workspace must both call it **with SymPy objects directly**, not by rendering
+and parsing a result. Keep interface input validation at each boundary.
+
+Add parity tests in `tests/test_operation_unification.py` and an
+independently meaningful cross-domain chain. If a new Python module is loaded
+in Pyodide, include it in `src/worker.js` and the offline precache in
+`sw.js`.
+
 ## How to describe a new operation
 
 For each operation, write: purpose in plain language; exact input and output kinds; required context/assumptions; JSON request; mathematical interpretation; limitations; an executable example; and the errors an invalid request should produce.

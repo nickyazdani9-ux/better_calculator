@@ -111,8 +111,55 @@ The table lists **every currently registered unified operation**. “Accepted”
 | `raise_index` | covector | requires metric; uses inverse metric | vector |
 | `lower_index` | vector | requires metric | covector |
 | `change_coordinates` | scalar_field, vector, covector, tensor2 | `coordinates` new coordinate names; `mapping` **list of old coordinates as functions of new**; local nonsingular Jacobian; both charts must use different coordinate names | same kind with new chart/metric |
+| `fourier` | scalar | `variable` (input), `frequency` (output); two-sided Fourier convention with exponent -2πikx | scalar |
+| `inverse_fourier` | scalar | `variable` (frequency), `frequency` (output coordinate); inverse of same 2π convention | scalar |
+| `laplace` | scalar | `variable` (time), `frequency` (Laplace variable); unilateral Laplace transform; convergence conditions suppressed | scalar |
+| `inverse_laplace` | scalar | `variable` (Laplace variable), `frequency` (time); inverse unilateral transform | scalar |
+| `limit` | scalar | `variable`, optional `point` formula (default 0), `direction` one of `+`, `-`, `+-` (default `+-`) | scalar |
+| `series` | scalar | `variable`, optional `point` formula (default 0), integer `order` 1–18 (default 6); includes order term | scalar |
+| `matrix_inverse` | matrix | source must be square and invertible | matrix |
+| `matrix_transpose` | matrix | swaps matrix row/column dimensions | matrix |
+| `matrix_multiply` | matrix | `other` matrix node with compatible dimensions; conventional matrix product | matrix |
 
 “all six kinds” means scalar, scalar_field, vector, covector, matrix, tensor2. Rank-two tensor variance is stored as the ordered pair `["up","down"]`, `["down","up"]`, etc.
+
+### Shared operation adapters (first integration slice)
+
+The operations `fourier`, `inverse_fourier`, `laplace`, `inverse_laplace`,
+`limit`, `series`, `matrix_inverse`, `matrix_transpose`, and
+`matrix_multiply` use the **same SymPy implementation functions as the
+legacy tab operations**. They accept typed source values without reparsing
+any formatted result strings.
+
+For now, integral transforms, limits and series accept **unscoped scalar nodes
+only**. A `scalar_field` with declared chart/metric cannot be silently
+reinterpreted as a frequency-domain field; a future coordinate/dual-space
+model will make those transitions explicit.
+
+The Fourier convention is
+
+```text
+F(k) = ∫ f(x) exp(-2*pi*I*k*x) dx
+```
+
+and the Laplace transform is one-sided (t ≥ 0). As in the existing tab,
+the Laplace transform currently returns its expression without convergence
+conditions. Ensure those conditions hold when interpreting the result.
+Some transforms or series may remain unevaluated or include symbolic order
+terms; the graph retains those objects rather than claiming numerical answers.
+
+A `matrix_multiply` operation is **different from `multiply`**:
+`multiply` is scalar multiplication or scalar products, while
+`matrix_multiply` explicitly composes two compatible matrices.
+
+Example:
+
+~~~json
+{"action":"workspace","command":"apply","id":"spectrum","source":"gaussian",
+ "operation":"fourier","variable":"x","frequency":"k"}
+~~~
+
+See [the transform/matrix recipe](RECIPES.md#d-transforms--linear-algebra--transforms).
 
 ### Coordinate-change example
 

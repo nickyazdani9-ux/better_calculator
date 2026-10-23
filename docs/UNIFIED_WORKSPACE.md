@@ -203,6 +203,20 @@ Example (each object has a prior node ID):
 The transformed vector has components \`[r,0]\` in polar coordinates.
 Changing coordinates is not changing the underlying geometric object.
 
+## Shared legacy operation implementations
+
+Several existing tab operations now use the same pure SymPy implementations
+as typed workspace operations: Fourier/Laplace transforms (and their inverses),
+limits, series, matrix inversion, transposition and matrix multiplication.
+The unified node graph preserves mathematical operands as objects rather than
+reconstructing them from text.
+
+These are currently a carefully typed subset, **not blanket exposure of all
+legacy plugins**. Integral transforms currently require an unscoped scalar;
+the more complicated transformation laws needed for chart-aware fields and
+tensor-valued transforms remain future work. See the maintained
+[API reference](API.md#operations) and [worked recipes](RECIPES.md).
+
 ## Explicit limits and next work
 
 This is a **kernel foundation, not a full mathematical unification**.

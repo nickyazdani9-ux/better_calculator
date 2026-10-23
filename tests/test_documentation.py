@@ -57,6 +57,7 @@ def test_recipes_execute_and_restore_exact_graphs():
         'linear_complex_calculus': ('integrated', 7*sp.Symbol('t')**2),
         'geometry_tensor_calculus': ('radial', 2*sp.Symbol('r', real=True)),
         'complex_geometry_probability': ('expected', sp.Integer(16)),
+        'transform_linear_calculus': ('recovered', 2*sp.exp(-sp.pi*sp.Symbol('x')**2)),
     }
     for name, (node_id, value) in expected.items():
         request = json.loads((ROOT / 'docs/examples' / (name+'.json')).read_text(encoding='utf-8'))

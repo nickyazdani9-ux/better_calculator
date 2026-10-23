@@ -87,3 +87,24 @@ test('cross-domain workflow keeps metric, provenance and result after reload', a
   expect(nodes[3].expr).toBe('16');
   expect(nodes[3].parents).toEqual(['norm']);
 });
+
+
+test('unified worker composes Fourier transforms with matrix determinant', async ({page}) => {
+  await attachWorker(page);
+  await page.goto('/');
+  await expect(page.locator('#engine-indicator')).toHaveAttribute('data-state', 'ready', {timeout: 150000});
+  const result=await workspaceCommand(page, {command: 'batch',steps:[
+    {command:'define',id:'gaussian',expression:'exp(-pi*x^2)'},
+    {command:'apply',id:'spectrum',source:'gaussian',operation:'fourier',
+     variable:'x',frequency:'k'},
+    {command:'define',id:'m',kind:'matrix',matrix:'[[2,0],[0,1]]'},
+    {command:'apply',id:'det',source:'m',operation:'determinant'},
+    {command:'apply',id:'scaled',source:'spectrum',other:'det',operation:'multiply'},
+    {command:'apply',id:'recovered',source:'scaled',operation:'inverse_fourier',
+     variable:'k',frequency:'x'}
+  ]});
+  expect(result.ok).toBe(true);
+  expect(result.results[1].node.expr).toContain('exp(-pi*k**2)');
+  expect(result.results[5].node.expr).toContain('exp(-pi*x**2)');
+  expect(result.results[5].node.parents).toEqual(['scaled']);
+});
