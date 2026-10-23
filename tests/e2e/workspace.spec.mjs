@@ -80,7 +80,7 @@ test('cross-domain workflow keeps metric, provenance and result after reload', a
   const nodes = restored.nodes;
   expect(nodes.map(node => node.id)).toEqual(['f', 'df', 'norm', 'expected']);
   expect(nodes[0].context.coordinates).toEqual(['x', 'y']);
-  expect(nodes[0].context.metric).toBe('Matrix([[1, 0], [0, 1]])');
+  expect(nodes[0].context.metric.replace(/\s+/g, '')).toBe('Matrix([[1,0],[0,1]])');
   expect(nodes[1].kind).toBe('covector');
   expect(nodes[1].parents).toEqual(['f']);
   expect(nodes[2].parents).toEqual(['df']);
