@@ -93,10 +93,10 @@ def test_limit_and_series_feed_existing_unified_calculus():
     ("laplace","waves","laplace",{"expression":"exp(-t)","variable":"t","frequency":"s"}),
     ("inverse_laplace","waves","inverse_laplace",{"expression":"1/(s+1)","variable":"s","frequency":"t"}),
     ("limit","calculus","limit",{"expression":"sin(x)/x","variable":"x","point":"0","direction":"+-"}),
-    ("series","calculus","series",{"expression":"exp(x)","variable":"x","point":"0","order":"5"}),
+    ("series","calculus","series",{"expression":"exp(x)","variable":"x","around":"0","order":"5"}),
     ("matrix_inverse","linear","inverse",{"matrix":"[[1,2],[3,5]]"}),
     ("matrix_transpose","linear","transpose",{"matrix":"[[1,2],[3,5]]"}),
-]):
+])
 def test_same_result_through_legacy_and_unified_entrypoints(op,tab,legacy_op,values):
     w=Workspace()
     kind="matrix" if tab=="linear" else "scalar"
@@ -104,8 +104,8 @@ def test_same_result_through_legacy_and_unified_entrypoints(op,tab,legacy_op,val
     definition["matrix" if kind=="matrix" else "expression"]=values["matrix" if kind=="matrix" else "expression"]
     assert w.handle(definition)["ok"]
     args={"command":"apply","id":"output","source":"source","operation":op}
-    args.update({k:(int(v) if k=="order" else v) for k,v in values.items()
-                 if k not in ("expression","matrix")})
+    args.update({("point" if k=="around" else k):(int(v) if k=="order" else v)
+                 for k,v in values.items() if k not in ("expression","matrix")})
     result=w.handle(args)
     assert result["ok"], result
     legacy=json.loads(run_json(json.dumps({"tab":tab,"operation":legacy_op,"values":values})))
