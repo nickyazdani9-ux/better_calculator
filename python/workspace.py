@@ -166,6 +166,16 @@ class Workspace:
             raise ValueError('Incompatible coordinate systems; supply an explicit coordinate transform.')
         if left.metric is not None and right.metric is not None and left.metric != right.metric:
             raise ValueError('Incompatible metrics; select or transform to a shared metric.')
+        # Symbol('x') and a real chart coordinate x are different SymPy objects.
+        # Never combine them silently only because their printed names match.
+        scoped = left if left.coords else right
+        unscoped = right if left.coords else left
+        if scoped.coords and not unscoped.coords:
+            chart_names = {c.name for c in scoped.coords}
+            collisions = [s for s in unscoped.value.free_symbols
+                          if s.name in chart_names and s not in scoped.coords]
+            if collisions:
+                raise ValueError('Undeclared coordinate assumptions conflict; define both objects in the same chart.')
         return left.coords or right.coords, left.metric if left.metric is not None else right.metric
 
     def apply(self, request):
