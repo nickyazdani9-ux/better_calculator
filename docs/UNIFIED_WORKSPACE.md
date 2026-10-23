@@ -52,6 +52,28 @@ combining context-dependent objects. Substituting a coordinate discards its
 old chart and metric context rather than silently inventing an induced metric.
 A probability expectation similarly drops the old coordinate context.
 
+## Universal composition contract (M1 acceptance criterion)
+
+The complex-field → geometry → probability example is **illustrative only**.
+The API must not encode any privileged sequence of mathematical disciplines.
+Any output node can be used as the input to *any* operation whose mathematical
+input contract it satisfies, in any order, including branching and merging
+results from unrelated operations. The engine must preserve types, assumptions,
+coordinates, metrics and dependencies rather than flattening results to strings.
+
+The valid order is determined by **input/output compatibility**, not by
+manually choosing a subject or by a list of prebuilt workflows. An operation
+which requires additional mathematical structure (e.g. an inner product,
+complex variable, connection or probability measure) must demand that context
+explicitly. Unsupported compositions fail with a clear error; they are not
+silently interpreted as a different mathematical object.
+
+Regression tests deliberately chain operations across complex analysis,
+linear algebra, calculus and geometry in different orders, branching and
+recombining intermediate nodes. New mathematical plugins must expose
+compatible object and operation contracts through this same graph, rather
+than introducing separate cross-domain adapters for each pair of subjects.
+
 ## End-to-end example
 
 Request:
