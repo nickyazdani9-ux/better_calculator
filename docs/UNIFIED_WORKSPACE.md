@@ -15,8 +15,8 @@ via the existing calculate message:
 
 Nodes live in memory in the Python interpreter owned by the worker. The caller
 can use separate requests or send an **atomic batch**. Restarting or resetting the worker removes workspace nodes **unless a previously
-exported versioned JSON snapshot is imported again**. The engine supports
-validated snapshots, but no automatic browser-side persistence has been wired up.
+exported versioned JSON snapshot is imported again**. The engine supports validated snapshots. The browser shell now automatically stores
+these snapshots in localStorage and restores them when the worker starts.
 
 ## Node contracts
 
@@ -125,8 +125,13 @@ from the original mathematical commands. The previous workspace is replaced
 limited by schema version, size and node count. An export is detached from the
 engine state so subsequent caller changes cannot mutate the saved graph.
 
-**Not yet implemented:** automatic saving to browser localStorage/IndexedDB,
-UI controls for selecting stored workspaces, or version migrations beyond v1.
+**Implemented in the browser shell:** successful workspace mutations trigger a
+validated JSON snapshot saved under `calculator2.workspace.v1`; initialization
+replays that snapshot into the worker. A failed restore clears the invalid saved
+copy rather than crashing the legacy calculator.
+
+**Not yet implemented:** UI controls for selecting stored workspaces, IndexedDB
+storage, or version migrations beyond v1.
 
 ## Coordinate changes and rank-two tensors (next engine slice)
 
@@ -182,10 +187,10 @@ This is a **kernel foundation, not a full mathematical unification**.
 - Probability currently supports independent normal substitutions and an
   expectation operation. Correlated variables, measures, and explicit
   distribution nodes will require richer typed contexts.
-- JSON snapshot export/import is implemented, but automatic browser storage and graph-to-UI projection are not yet connected.
+- JSON snapshot export/import and browser-local automatic restoration are implemented; graph-to-UI projection and version migration remain future work.
 - Only real symmetric metrics with provably real components are supported.
 - Computation limits on expressions do not provide a hard wall-clock timeout.
 
 Future work should add explicit coordinate transforms, tensor types with
-variance/shape, distribution objects and measure context, then connect versioned snapshots to durable browser storage and graph evaluation. The UI should be built
+variance/shape, distribution objects and measure context, then implement stable graph evaluation, migration and the eventual user-facing workflow interface. The UI should be built
 on top of these contracts rather than duplicating discipline-specific logic.
