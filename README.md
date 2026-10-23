@@ -106,7 +106,8 @@ intermediate results back into text.
 See [unified workspace architecture](docs/UNIFIED_WORKSPACE.md) for the full
 JSON protocol, a worked example, safety constraints, and limits. The original
 calculator UI and all existing tab operations remain unchanged; graphical
-workflow editing and automatic browser snapshot storage are deferred until the kernel contracts are established.
+workflow editing is deferred until the kernel contracts are established; workspace
+snapshots are saved and restored automatically in the browser-local storage layer.
 
 ## Typeset working and worksheets
 
