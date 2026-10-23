@@ -254,6 +254,7 @@ class Workspace:
             if request.get('independent') is not True:
                 raise ValueError('Independent normal variables must be explicitly acknowledged (independent: true).')
             subs = {}
+            random_names = set(normals)
             for name, info in normals.items():
                 if not isinstance(info, dict):
                     raise ValueError('Each normal variable requires mean and std.')
@@ -266,6 +267,8 @@ class Workspace:
                 std = scalar_expr(info.get('std', '1'))
                 if std.is_positive is not True:
                     raise ValueError('Normal standard deviations must be provably positive.')
+                if any(s.name in random_names for s in mean.free_symbols | std.free_symbols):
+                    raise ValueError('Distribution parameters cannot depend on the declared random variables.')
                 subs[free] = Normal('rv_' + name, mean, std)
             value = sp.simplify(E(value.subs(subs)))
             # An expectation is not automatically a field on the original chart.
