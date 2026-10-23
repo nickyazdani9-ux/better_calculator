@@ -1,5 +1,9 @@
 # Calculator 2.0 architecture
 
+For readers new to the project, start at the [documentation index](README.md).
+The [API reference](API.md) is the authoritative current workspace contract.
+
+
 ```
 python/plugins/*.py   -- catalog exporter --> assets/catalog.json
           |                                    |
@@ -18,6 +22,17 @@ python/plugins/*.py   -- catalog exporter --> assets/catalog.json
 `node scripts/build-web.mjs` only emits explicitly allowed resources under `dist/`. It does **not** publish `.github`, repository history or test code. The optional `vendor/pyodide/` contains Pyodide 0.29.5 binaries, stdlib, SymPy and all wheel dependencies discovered transitively from the matching Pyodide lockfile. The fetcher checks the wheel SHA-256 where specified. The worker preferentially loads `vendor/pyodide/pyodide.js` before falling back to pinned CDN.
 
 The Electron window uses `sandbox: true`, `nodeIntegration: false`, `contextIsolation: true` and a loopback-bound local HTTP server. The server serves only the `dist/` subtree. No shell/network API is exposed to mathematical plugins. Capacitor hosts the same `dist/` files in platform WebViews. Safari, Chromium and WebViews have different WASM memory/security constraints, so successful builds alone are not sufficient runtime certification.
+
+### Unified graph extension (first iteration)
+
+`python/workspace.py` implements a composable, typed DAG of symbolic
+objects. The new `action: workspace` request is dispatched from the existing
+`engine.run_json` boundary, and `src/worker.js` preloads this module into
+Pyodide. Existing tab/plugin commands remain compatible.
+
+This layer makes mathematical context (coordinates and metric), operation
+contracts, and dependency edges explicit. See
+[UNIFIED_WORKSPACE.md](UNIFIED_WORKSPACE.md) for the protocol and current limits.
 
 ### Add an operation
 

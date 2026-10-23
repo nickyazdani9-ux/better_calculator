@@ -1,0 +1,45 @@
+{
+  "command": "batch",
+  "steps": [
+    {
+      "command": "define",
+      "id": "gaussian",
+      "expression": "exp(-pi*x^2)"
+    },
+    {
+      "command": "apply",
+      "id": "spectrum",
+      "source": "gaussian",
+      "operation": "fourier",
+      "variable": "x",
+      "frequency": "k"
+    },
+    {
+      "command": "define",
+      "id": "m",
+      "kind": "matrix",
+      "matrix": "[[2,0],[0,1]]"
+    },
+    {
+      "command": "apply",
+      "id": "det",
+      "source": "m",
+      "operation": "determinant"
+    },
+    {
+      "command": "apply",
+      "id": "scaled",
+      "source": "spectrum",
+      "other": "det",
+      "operation": "multiply"
+    },
+    {
+      "command": "apply",
+      "id": "recovered",
+      "source": "scaled",
+      "operation": "inverse_fourier",
+      "variable": "k",
+      "frequency": "x"
+    }
+  ]
+}

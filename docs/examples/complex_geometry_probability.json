@@ -1,0 +1,44 @@
+{
+  "command": "batch",
+  "steps": [
+    {
+      "command": "define",
+      "id": "f",
+      "expression": "(x+I*y)^2",
+      "coordinates": [
+        "x",
+        "y"
+      ],
+      "metric": "[[1,0],[0,1]]"
+    },
+    {
+      "command": "apply",
+      "id": "df",
+      "source": "f",
+      "operation": "exterior_derivative"
+    },
+    {
+      "command": "apply",
+      "id": "norm",
+      "source": "df",
+      "operation": "norm_squared"
+    },
+    {
+      "command": "apply",
+      "id": "expected",
+      "source": "norm",
+      "operation": "expectation",
+      "independent": true,
+      "normals": {
+        "x": {
+          "mean": "0",
+          "std": "1"
+        },
+        "y": {
+          "mean": "0",
+          "std": "1"
+        }
+      }
+    }
+  ]
+}

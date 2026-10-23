@@ -1,4 +1,5 @@
 import {validateCatalog, findOperation, defaultsFor} from './registry.js';
+import {readWorkspaceSnapshot, writeWorkspaceSnapshot, clearWorkspaceSnapshot} from './workspace-storage.js';
 const $ = selector => document.querySelector(selector);
 const STORE = 'calculator2.v1';
 const safeLoad = () => { try {return JSON.parse(localStorage.getItem(STORE)) || {}} catch {return {}} };
@@ -292,12 +293,22 @@ async function setup(){
   window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();state.installPrompt=event;$('#install').hidden=false;});
   window.addEventListener('appinstalled',()=>{$('#install-note').textContent='Installed successfully.';$('#install').hidden=true;});
   worker.onmessage=event=>{
-    const {type,status,note,id,result}=event.data||{};
+    const {type,status,note,id,result,snapshot}=event.data||{};
+    if(type==='workspace-snapshot'){
+      try {writeWorkspaceSnapshot(localStorage,snapshot);} catch { /* disabled or full storage */ }
+      return;
+    }
+    if(type==='workspace-restore-error'){
+      try {clearWorkspaceSnapshot(localStorage);} catch {}
+      return;
+    }
     if(type==='status')setStatus(status,note);
     if(type==='response'){const resolve=pending.get(id);if(resolve){pending.delete(id);resolve(result);}}
   };
   worker.onerror=event=>setStatus('error','Worker failed: '+event.message);
-  worker.postMessage({type:'init'});
+  let restored=null;
+  try {restored=readWorkspaceSnapshot(localStorage);} catch {}
+  worker.postMessage({type:'init',snapshot:restored});
   if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 }
 setup();

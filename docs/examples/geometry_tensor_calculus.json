@@ -1,0 +1,61 @@
+{
+  "command": "batch",
+  "steps": [
+    {
+      "command": "define",
+      "id": "f",
+      "expression": "x*y",
+      "coordinates": [
+        "x",
+        "y"
+      ],
+      "metric": "[[1,0],[0,1]]"
+    },
+    {
+      "command": "apply",
+      "id": "df",
+      "source": "f",
+      "operation": "exterior_derivative"
+    },
+    {
+      "command": "apply",
+      "id": "raised",
+      "source": "df",
+      "operation": "raise_index"
+    },
+    {
+      "command": "apply",
+      "id": "tensor",
+      "source": "raised",
+      "other": "df",
+      "operation": "tensor_product"
+    },
+    {
+      "command": "apply",
+      "id": "trace",
+      "source": "tensor",
+      "operation": "contract"
+    },
+    {
+      "command": "apply",
+      "id": "polar",
+      "source": "trace",
+      "operation": "change_coordinates",
+      "coordinates": [
+        "r",
+        "theta"
+      ],
+      "mapping": [
+        "r*cos(theta)",
+        "r*sin(theta)"
+      ]
+    },
+    {
+      "command": "apply",
+      "id": "radial",
+      "source": "polar",
+      "operation": "differentiate",
+      "variable": "r"
+    }
+  ]
+}

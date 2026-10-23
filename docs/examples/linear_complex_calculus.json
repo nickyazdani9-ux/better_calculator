@@ -1,0 +1,63 @@
+{
+  "command": "batch",
+  "steps": [
+    {
+      "command": "define",
+      "id": "meromorphic",
+      "expression": "1/(z-2)"
+    },
+    {
+      "command": "apply",
+      "id": "residue",
+      "source": "meromorphic",
+      "operation": "residue",
+      "variable": "z",
+      "point": "2"
+    },
+    {
+      "command": "define",
+      "id": "m",
+      "kind": "matrix",
+      "matrix": "[[2,0],[0,3]]"
+    },
+    {
+      "command": "apply",
+      "id": "det",
+      "source": "m",
+      "operation": "determinant"
+    },
+    {
+      "command": "apply",
+      "id": "combined",
+      "source": "det",
+      "other": "residue",
+      "operation": "add"
+    },
+    {
+      "command": "define",
+      "id": "polynomial",
+      "expression": "t^2"
+    },
+    {
+      "command": "apply",
+      "id": "product",
+      "source": "combined",
+      "other": "polynomial",
+      "operation": "multiply"
+    },
+    {
+      "command": "apply",
+      "id": "derived",
+      "source": "product",
+      "operation": "differentiate",
+      "variable": "t"
+    },
+    {
+      "command": "apply",
+      "id": "integrated",
+      "source": "derived",
+      "operation": "integrate",
+      "variable": "t"
+    }
+  ]
+}

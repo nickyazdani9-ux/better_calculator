@@ -1,5 +1,18 @@
 # Calculator 2.0
 
+## Documentation — start here
+
+New to the calculator? Follow the [documentation index](docs/README.md).
+It provides a five-minute [getting started guide](docs/GETTING_STARTED.md),
+[mathematical concepts](docs/CONCEPTS.md), a full [unified API reference](docs/API.md),
+a [generated reference of all legacy tab operations](docs/LEGACY_API.md),
+and [executable cross-domain recipes](docs/RECIPES.md).
+
+The unified workspace currently has an **experimental, engine-only API**;
+the existing tabbed UI still uses the legacy API. Documentation and examples
+are tested with the code and will continue evolving.
+
+
 **Extensible SymPy computer algebra system** with local execution and builds for web, Android, iOS, macOS, Windows and Linux. Built from the original Calculator 2.0 PWA, preserving the tab/plugin architecture and themes.
 
 ## Current mathematical tabs
@@ -92,6 +105,22 @@ If additional dependencies are required in Pyodide, amend `scripts/vendor_pyodid
 - Some symbolic expressions may be resource-intensive. There is no hard computation interrupt or memory budget yet.
 
 MIT licensed; see [LICENSE](LICENSE).
+
+## Unified mathematical workspace (engine-only preview)
+
+A typed mathematical graph is now available through the existing JSON CAS boundary
+with `{"action":"workspace"}`. It permits cross-domain chains with reusable in-worker object references, versioned JSON snapshot export/import,
+declared coordinate systems and metrics, and
+explicit probability assumptions. For example, a complex scalar field can
+be differentiated as a 1-form, have its metric squared norm computed, and
+then be passed into a normal-distribution expectation — without converting
+intermediate results back into text.
+
+See [unified workspace architecture](docs/UNIFIED_WORKSPACE.md) for the full
+JSON protocol, a worked example, safety constraints, and limits. The original
+calculator UI and all existing tab operations remain unchanged; graphical
+workflow editing is deferred until the kernel contracts are established; workspace
+snapshots are saved and restored automatically in the browser-local storage layer.
 
 ## Typeset working and worksheets
 
