@@ -16,7 +16,7 @@ NODE_ID = re.compile(r'[a-z][a-z0-9_]{0,31}\Z')
 MAX_NODES = 64
 MAX_BATCH = 24
 SCALARS = frozenset({'scalar', 'scalar_field'})
-ALL_KINDS = frozenset({'scalar', 'scalar_field', 'vector', 'covector', 'matrix'})
+ALL_KINDS = frozenset({'scalar', 'scalar_field', 'vector', 'covector', 'matrix', 'tensor2'})
 
 
 def symbol(token, *, real=False):
@@ -69,6 +69,50 @@ def context_metric(raw, coords):
     return matrix
 
 
+def change_chart(kind, value, old_coords, old_metric, variance, target_names, mapping):
+    """Pull components into a new chart given old coordinates as functions of new.
+
+    J[i,a] = partial old_x[i] / partial new_x[a]. The requested map
+    must be locally invertible; singular chart boundaries are not inferred.
+    """
+    if not old_coords:
+        raise ValueError('Coordinate transformation requires an existing chart.')
+    new_coords = coordinates(target_names)
+    if len(new_coords) != len(old_coords):
+        raise ValueError('Coordinate transformation must preserve dimension.')
+    if set(new_coords) & set(old_coords) or {x.name for x in new_coords} & {x.name for x in old_coords}:
+        raise ValueError('Use distinct old and new coordinate names.')
+    if not isinstance(mapping, list) or len(mapping) != len(old_coords):
+        raise ValueError('Mapping must give each old coordinate as an expression in the new coordinates.')
+    functions = [scalar_expr(expr, new_coords) for expr in mapping]
+    if any(not expr.free_symbols <= set(new_coords) for expr in functions):
+        raise ValueError('Coordinate mapping may depend only on the new chart coordinates.')
+    jac = sp.ImmutableMatrix([[sp.diff(expr, c) for c in new_coords] for expr in functions])
+    if sp.simplify(jac.det()) == 0:
+        raise ValueError('Coordinate transformation has a singular Jacobian.')
+    inverse = jac.inv()
+    substitution = dict(zip(old_coords, functions))
+    if isinstance(value, sp.MatrixBase):
+        changed = value.subs(substitution, simultaneous=True)
+        if kind == 'vector':
+            changed = inverse * changed
+        elif kind == 'covector':
+            changed = jac.T * changed
+        elif kind == 'tensor2':
+            left = inverse if variance[0] == 'up' else jac.T
+            right = inverse if variance[1] == 'up' else jac.T
+            changed = left * changed * right.T
+        else:
+            raise ValueError('Generic matrices do not have a tensor transformation law.')
+        changed = sp.ImmutableMatrix(changed.applyfunc(sp.simplify))
+    else:
+        changed = sp.simplify(value.subs(substitution, simultaneous=True))
+    new_metric = None
+    if old_metric is not None:
+        metric_at_new = old_metric.subs(substitution, simultaneous=True)
+        new_metric = sp.ImmutableMatrix((jac.T * metric_at_new * jac).applyfunc(sp.simplify))
+    return changed, new_coords, new_metric
+
 @dataclass(frozen=True)
 class MathNode:
     id: str
@@ -78,6 +122,7 @@ class MathNode:
     operation: str = 'define'
     coords: tuple = ()
     metric: object = None
+    variance: tuple = ()
 
     def public(self):
         return {
@@ -87,6 +132,7 @@ class MathNode:
             'latex': sp.latex(self.value),
             'parents': list(self.parents),
             'operation': self.operation,
+            'variance': list(self.variance),
             'context': {
                 'coordinates': [str(c) for c in self.coords],
                 'metric': sp.sstr(self.metric) if self.metric is not None else None,
@@ -110,6 +156,12 @@ OPERATION_SIGNATURES = {
     'expectation': SCALARS,
     'add': ALL_KINDS,
     'multiply': ALL_KINDS,
+    'pair': frozenset({'vector', 'covector'}),
+    'tensor_product': frozenset({'vector', 'covector'}),
+    'contract': frozenset({'tensor2'}),
+    'raise_index': frozenset({'covector'}),
+    'lower_index': frozenset({'vector'}),
+    'change_coordinates': frozenset({'scalar_field', 'vector', 'covector', 'tensor2'}),
 }
 
 
@@ -189,6 +241,7 @@ class Workspace:
         value, kind = source.value, source.kind
         coords, metric = source.coords, source.metric
         parents = (source.id,)
+        variance = source.variance
 
         if op in ('simplify', 'expand', 'factor', 'conjugate'):
             fn = {'simplify': sp.simplify, 'expand': sp.expand, 'factor': sp.factor,
@@ -228,6 +281,26 @@ class Workspace:
             matrix = metric.inv() if kind == 'covector' else metric
             value = sp.simplify((value.conjugate().T * matrix * value)[0])
             kind = 'scalar_field'
+        elif op == 'raise_index':
+            if metric is None:
+                raise ValueError('Raising an index requires a metric.')
+            value = metric.inv() * value
+            kind = 'vector'
+        elif op == 'lower_index':
+            if metric is None:
+                raise ValueError('Lowering an index requires a metric.')
+            value = metric * value
+            kind = 'covector'
+        elif op == 'change_coordinates':
+            value, coords, metric = change_chart(
+                kind, value, coords, metric, variance,
+                request.get('coordinates'), request.get('mapping'))
+        elif op == 'contract':
+            if variance not in (('up', 'down'), ('down', 'up')):
+                raise ValueError('Contraction needs one upper and one lower index; use the metric explicitly.')
+            value = sp.simplify(sp.trace(value))
+            kind = 'scalar_field'
+            variance = ()
         elif op == 'determinant':
             if value.rows != value.cols:
                 raise ValueError('Determinant requires a square matrix.')
@@ -244,8 +317,9 @@ class Workspace:
                 coords, metric = (), None
                 if kind == 'scalar_field':
                     kind = 'scalar'
-                if kind in ('vector', 'covector'):
+                if kind in ('vector', 'covector', 'tensor2'):
                     kind = 'matrix'
+                    variance = ()
         elif op == 'expectation':
             from sympy.stats import Normal, E
             normals = request.get('normals')
@@ -274,19 +348,38 @@ class Workspace:
             # An expectation is not automatically a field on the original chart.
             coords, metric = (), None
             kind = 'scalar'
-        elif op in ('add', 'multiply'):
+        elif op in ('add', 'multiply', 'pair', 'tensor_product'):
             other = self._get(request.get('other'))
             coords, metric = self._merge_context(source, other)
             parents += (other.id,)
             scalar_pair = source.kind in SCALARS and other.kind in SCALARS
-            same_linear_kind = source.kind == other.kind and source.kind in ('vector', 'covector', 'matrix')
-            scalar_linear_pair = ((source.kind in SCALARS and other.kind in ('vector', 'covector', 'matrix')) or
-                                  (other.kind in SCALARS and source.kind in ('vector', 'covector', 'matrix')))
-            if op == 'add' and not (scalar_pair or same_linear_kind):
+            same_linear_kind = source.kind == other.kind and source.kind in ('vector', 'covector', 'matrix', 'tensor2')
+            scalar_linear_pair = ((source.kind in SCALARS and other.kind in ('vector', 'covector', 'matrix', 'tensor2')) or
+                                  (other.kind in SCALARS and source.kind in ('vector', 'covector', 'matrix', 'tensor2')))
+            if op == 'pair':
+                if {source.kind, other.kind} != {'vector', 'covector'}:
+                    raise ValueError('Canonical pairing requires a vector and a covector.')
+                vector = source.value if source.kind == 'vector' else other.value
+                covector = source.value if source.kind == 'covector' else other.value
+                value = sp.simplify((covector.T * vector)[0])
+                kind, variance = 'scalar_field', ()
+            elif op == 'tensor_product':
+                if source.kind not in ('vector', 'covector') or other.kind not in ('vector', 'covector'):
+                    raise ValueError('Tensor product requires two vector/covector operands.')
+                if not coords or source.coords != other.coords:
+                    raise ValueError('Tensor factors require the same declared coordinates.')
+                value = source.value * other.value.T
+                variance = tuple('up' if node.kind == 'vector' else 'down' for node in (source, other))
+                kind = 'tensor2'
+            elif op == 'add' and same_linear_kind and source.variance != other.variance:
+                raise ValueError('Cannot add tensors with different index variance.')
+            elif op == 'add' and not (scalar_pair or same_linear_kind):
                 raise ValueError('Addition requires compatible scalar or tensor kinds.')
-            if op == 'multiply' and not (scalar_pair or scalar_linear_pair):
+            elif op == 'multiply' and not (scalar_pair or scalar_linear_pair):
                 raise ValueError('Multiplication of these objects needs an explicit contraction or product.')
-            if scalar_pair:
+            if op in ('pair', 'tensor_product'):
+                pass
+            elif scalar_pair:
                 kind = 'scalar_field' if coords else 'scalar'
                 value = sp.simplify(value + other.value if op == 'add' else value * other.value)
             elif same_linear_kind:
@@ -295,11 +388,12 @@ class Workspace:
                 value = value + other.value
             else:
                 kind = other.kind if source.kind in SCALARS else source.kind
+                variance = other.variance if source.kind in SCALARS else source.variance
                 value = value * other.value if source.kind in SCALARS else other.value * value
 
         if isinstance(value, sp.MatrixBase):
             value = sp.ImmutableMatrix(value)
-        return self._save(MathNode(ident, kind, value, parents, op, coords, metric))
+        return self._save(MathNode(ident, kind, value, parents, op, coords, metric, variance))
 
     def handle(self, request):
         try:
