@@ -24,7 +24,7 @@
     "test": "npm run test:js && npm run test:python"
   },
   "dependencies": {
-    "@capacitor/core": "8.0.0"
+    "@capacitor/core": "8.5.3"
   },
   "devDependencies": {
     "@capacitor/cli": "8.0.0",
