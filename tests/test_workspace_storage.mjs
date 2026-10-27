@@ -53,3 +53,14 @@ test('rejects excessively large storage payloads',()=>{
     steps:[{command:'define',id:'f',expression:'x'.repeat(80000)}]
   }));
 });
+
+test('Fourier and directional limit commands survive saving and restoration',()=>{
+  const storage=memoryStorage();
+  const snapshot={format:'calculator2.workspace',version:1,steps:[
+    {command:'define',id:'f',expression:'exp(-pi*x^2)'},
+    {command:'apply',id:'spectrum',source:'f',operation:'fourier',variable:'x',frequency:'k'},
+    {command:'apply',id:'at_zero',source:'spectrum',operation:'limit',variable:'k',point:'0',direction:'+'}
+  ]};
+  writeWorkspaceSnapshot(storage,snapshot);
+  assert.deepEqual(readWorkspaceSnapshot(storage),snapshot);
+});

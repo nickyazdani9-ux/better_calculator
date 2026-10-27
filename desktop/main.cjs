@@ -2,6 +2,11 @@
 const {app,BrowserWindow,shell}=require('electron');
 const path=require('node:path');
 const {createStaticServer}=require('./static-server.cjs');
+// A stable origin keeps browser-local worksheets and typed workspaces across
+// native app restarts. The single-instance lock prevents our own port conflicts.
+const PORT=17827;
+const ownsLock=app.requestSingleInstanceLock();
+if(!ownsLock)app.quit();
 let server;
 let origin;
 function createWindow(){
@@ -14,11 +19,15 @@ function createWindow(){
   });
   win.loadURL(origin+'/');
 }
-app.whenReady().then(async()=>{
+app.on('second-instance',()=>{
+  const win=BrowserWindow.getAllWindows()[0];
+  if(win){if(win.isMinimized())win.restore();win.focus();}
+});
+if(ownsLock)app.whenReady().then(async()=>{
   server=createStaticServer(path.resolve(__dirname,'../dist'));
   await new Promise((resolve,reject)=>{
     server.once('error',reject);
-    server.listen(0,'127.0.0.1',resolve);
+    server.listen(PORT,'127.0.0.1',resolve);
   });
   origin=`http://127.0.0.1:${server.address().port}`;
   createWindow();

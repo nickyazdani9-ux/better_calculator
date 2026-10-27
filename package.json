@@ -1,13 +1,15 @@
 {
   "name": "calculator-2",
   "productName": "Calculator 2.0",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cross-platform extensible symbolic mathematics calculator",
   "private": true,
   "type": "module",
   "main": "desktop/main.cjs",
   "license": "MIT",
-  "engines": {"node": ">=22"},
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "serve": "python3 -m http.server 8000",
     "catalog": "python3 scripts/export_catalog.py",
@@ -27,22 +29,46 @@
     "@capacitor/core": "8.0.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.0.0",
     "@capacitor/android": "8.0.0",
+    "@capacitor/cli": "8.0.0",
     "@capacitor/ios": "8.0.0",
+    "@playwright/test": "1.56.1",
     "electron": "44.9.0",
     "electron-builder": "26.15.3",
-    "@playwright/test": "1.56.1"
+    "katex": "0.16.25"
   },
   "build": {
     "appId": "dev.calculator2.app",
     "productName": "Calculator 2.0",
-    "directories": {"output": "release/desktop"},
-    "files": ["dist/**", "desktop/**", "icons/**", "package.json"],
+    "directories": {
+      "output": "release/desktop"
+    },
+    "files": [
+      "dist/**",
+      "desktop/**",
+      "icons/**",
+      "package.json"
+    ],
     "asar": true,
     "npmRebuild": false,
-    "mac": {"target": ["zip"], "category": "public.app-category.education", "identity": null},
-    "win": {"target": ["portable"]},
-    "linux": {"target": ["tar.gz"], "category": "Education", "icon": "icons/512.png"}
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "category": "public.app-category.education",
+      "identity": null
+    },
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "linux": {
+      "target": [
+        "tar.gz"
+      ],
+      "category": "Education",
+      "icon": "icons/512.png"
+    }
   }
 }

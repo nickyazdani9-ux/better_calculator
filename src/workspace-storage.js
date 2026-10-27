@@ -8,7 +8,7 @@ const MAX_STEPS = 64;
 const FIELDS = {
   define: new Set(['command','id','kind','coordinates','metric','expression','components','matrix']),
   apply: new Set(['command','id','operation','source','other','variable','order','point',
-                  'lower','upper','expression','normals','independent','coordinates','mapping']),
+                  'lower','upper','expression','normals','independent','coordinates','mapping','frequency','direction']),
 };
 const plain = value => value !== null && typeof value === 'object' &&
   !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype;

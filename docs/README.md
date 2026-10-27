@@ -2,7 +2,7 @@
 
 This guide assumes you know mathematics, not this software.
 
-**Status:** The existing calculator tabs are usable in the application. The unified mathematical workspace is an **experimental, engine-only API** on the feature branch. There is no stable public HTTP API or polished graph editor yet.
+**Status:** Both the calculator tabs and the typed **Workspace** are available in the application. Workspace supports object creation, compatible operations, provenance inspection, executable examples, automatic device storage and JSON transfer. There is no public hosted HTTP API or drag-and-drop graph editor.
 
 ## Where to start
 
@@ -21,7 +21,7 @@ This guide assumes you know mathematics, not this software.
 
 **The application today:** Select a subject tab, choose an operation, enter an expression, and calculate. See [Getting started](GETTING_STARTED.md).
 
-**The new engine:** Define mathematical objects as nodes in a graph. Each operation receives an existing object and creates another, carrying mathematical type, coordinate context, and provenance. Use it through Python or the internal Web Worker protocol. The older tabs are **not yet backed by this graph interface**.
+**Workspace:** Define mathematical objects as nodes in a graph. Each operation receives an existing object and creates another, carrying mathematical type, coordinate context, and provenance. Use the visible Workspace controls, Python, or the internal Web Worker protocol. The older calculator tabs are not all backed by this graph interface.
 
 A legacy tab operation is not necessarily available as a graph operation. Read the [unified API](API.md) for supported graph operations and [legacy API](LEGACY_API.md) for existing tab operations.
 

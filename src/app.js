@@ -1,5 +1,6 @@
 import {validateCatalog, findOperation, defaultsFor} from './registry.js';
 import {readWorkspaceSnapshot, writeWorkspaceSnapshot, clearWorkspaceSnapshot} from './workspace-storage.js';
+import {setupStudio} from './studio.js';
 const $ = selector => document.querySelector(selector);
 const STORE = 'calculator2.v1';
 const safeLoad = () => { try {return JSON.parse(localStorage.getItem(STORE)) || {}} catch {return {}} };
@@ -12,6 +13,11 @@ const state = {
 };
 const worker = new Worker('./src/worker.js');
 const pending = new Map();
+function request(payload){
+  const id=++state.requestId;
+  return new Promise(resolve=>{pending.set(id,resolve);worker.postMessage({type:'calculate',id,payload});});
+}
+const studio=setupStudio({request,renderMath});
 function persist(){
   try{localStorage.setItem(STORE,JSON.stringify({tab:state.tab,operation:state.operation,drafts:state.drafts,history:state.history.slice(0,40),working:state.working.slice(0,20),theme:state.theme}));}
   catch{ /* quota/private mode */ }
@@ -24,6 +30,7 @@ function el(tag,cls='',text=''){
 }
 function setStatus(status,note){
   state.status=status;
+  studio.setStatus(status);
   const indicator=$('#engine-indicator');
   indicator.dataset.state=status;
   $('#engine-label').textContent = status==='ready'?'SymPy online':status==='error'?'Engine unavailable':'Initializing CAS';
@@ -199,11 +206,7 @@ async function calculate(){
   $('#run').disabled=true;$('#run-caption').textContent='Computing…';
   $('#result-state').textContent='Computing…';
   const payload={tab:state.tab,operation:state.operation,values:currentValues()};
-  const id=++state.requestId;
-  const result=await new Promise(resolve=>{
-    pending.set(id,resolve);
-    worker.postMessage({type:'calculate',id,payload});
-  });
+  const result=await request(payload);
   state.busy=false;setStatus(state.status,$('#engine-details').textContent);
   state.activeEntry=result.ok?{tab:payload.tab,operation:payload.operation,values:payload.values,result,time:Date.now()}:null;
   state.stepAdded=false;
@@ -246,7 +249,6 @@ function buildPalette(){
   }
 }
 async function setup(){
-  const katexStyle=document.createElement('link');katexStyle.rel='stylesheet';katexStyle.href='https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css';katexStyle.media='print';katexStyle.onload=()=>{katexStyle.media='all';};document.head.append(katexStyle);
   document.documentElement.dataset.theme=state.theme;
   $('#theme').value=state.theme;
   try {
@@ -295,14 +297,15 @@ async function setup(){
   worker.onmessage=event=>{
     const {type,status,note,id,result,snapshot}=event.data||{};
     if(type==='workspace-snapshot'){
-      try {writeWorkspaceSnapshot(localStorage,snapshot);} catch { /* disabled or full storage */ }
+      try {writeWorkspaceSnapshot(localStorage,snapshot);studio.saved(true);} catch {studio.saved(false);}
       return;
     }
     if(type==='workspace-restore-error'){
-      try {clearWorkspaceSnapshot(localStorage);} catch {}
+      studio.restoreError(event.data.error);
       return;
     }
     if(type==='status')setStatus(status,note);
+    if(type==='ready')studio.ready();
     if(type==='response'){const resolve=pending.get(id);if(resolve){pending.delete(id);resolve(result);}}
   };
   worker.onerror=event=>setStatus('error','Worker failed: '+event.message);

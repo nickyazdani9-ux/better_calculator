@@ -42,8 +42,6 @@ async function initialize() {
     for(const [name,source] of pluginSources){pyodide.FS.writeFile(`/home/pyodide/plugins/${name}.py`,source);}
     pyodide.runPython('import sys; sys.path.insert(0,"/home/pyodide"); from engine import run_json');
     cachedVersion = pyodide.version;
-    state('ready',`SymPy ready • Python ${cachedVersion}`);
-    self.postMessage({type:'ready'});
   })().catch(error=>{initializing=null;state('error',String(error.message || error));throw error;});
   return initializing;
 }
@@ -59,6 +57,8 @@ self.addEventListener('message',async event=>{
         const response=JSON.parse(pyodide.runPython('run_json(request_payload_json)'));
         if(!response.ok)self.postMessage({type:'workspace-restore-error',error:response.error});
       }
+      state('ready',`SymPy ready • Pyodide ${cachedVersion}`);
+      self.postMessage({type:'ready'});
     } catch(error) {
       self.postMessage({type:'workspace-restore-error',error:String(error.message||error)});
     }

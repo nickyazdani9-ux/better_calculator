@@ -40,6 +40,7 @@ Requirements: Python 3.13 or compatible local Python, Node.js 22+ (for packaging
 
 ```bash
 python -m pip install 'sympy>=1.13,<2' 'pytest>=8,<10' 'pyyaml>=6,<7'
+npm ci
 npm run test:js
 python -m pytest tests/test_*.py -q
 npm run vendor                # download pinned Pyodide runtime, wheel deps (requires internet)
@@ -47,7 +48,7 @@ npm run build:native          # builds fully vendored static files under dist/
 python3 -m http.server 8000 --directory dist
 ```
 
-Visit `http://localhost:8000/`. The local build ships its math engine, although optional KaTeX typesetting currently uses a CDN; plain-text answers remain available without it. `npm run build:web` is available without a vendored runtime for UI-only development, but native packages and CI require `build:native`.
+Visit `http://localhost:8000/`. Native builds bundle both the math engine and KaTeX typesetting, including fonts. `npm run build:web` is available without a vendored runtime for UI-only development, but native packages and CI require `build:native`.
 
 ## Native and desktop builds
 
@@ -79,7 +80,7 @@ The main workflow [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.
 
 Optional [signed Android](.github/workflows/android-signed.yml) and [signed iOS](.github/workflows/ios-signed.yml) workflows require platform signing secrets documented in `docs/CROSS_PLATFORM.md`. iOS IPA export requires a paid Apple Developer account, distribution certificate and provisioning profile; this does **not** automatically upload to TestFlight or the App Store.
 
-**CI has been defined and statically validated locally but has not run on GitHub yet.** Actual native builds must be verified on hosted runners after pushing. There is currently no committed npm lockfile because npm registry access was unavailable in this build environment; dependency versions are directly pinned in `package.json`, but for stronger supply-chain reproducibility generate and commit `package-lock.json` on a networked machine, then switch workflow installs to `npm ci`.
+CI builds and browser tests have run successfully; check the workflow attached to the commit you are installing for its current platform results. Dependencies are recorded in `package-lock.json`. Native desktop jobs capture the actual application and test workspace restoration after relaunch. Android packages are build-checked; physical-device acceptance and production signing remain separate release gates.
 
 ### Create a hosted repository
 
@@ -101,7 +102,7 @@ If additional dependencies are required in Pyodide, amend `scripts/vendor_pyodid
 - Tests precede new packaging scripts and enforce file/layout, scope control, dependency resolution, math and HTTP-server behaviour.
 - Python unit tests exercise real SymPy, including polar flatness and sphere curvature.
 - Browser E2E (CI only) evaluates a derivative in actual Chromium + Pyodide.
-- CI builds produce platform artifacts, **but the current pipeline does not yet execute automated UI tests on physical iOS/Android devices or native desktop apps**.
+- CI builds produce platform artifacts and native desktop UI/relaunch smoke tests. Physical iOS/Android device acceptance remains manual.
 - Some symbolic expressions may be resource-intensive. There is no hard computation interrupt or memory budget yet.
 
 MIT licensed; see [LICENSE](LICENSE).
@@ -117,10 +118,12 @@ then be passed into a normal-distribution expectation — without converting
 intermediate results back into text.
 
 See [unified workspace architecture](docs/UNIFIED_WORKSPACE.md) for the full
-JSON protocol, a worked example, safety constraints, and limits. The original
-calculator UI and all existing tab operations remain unchanged; graphical
-workflow editing is deferred until the kernel contracts are established; workspace
-snapshots are saved and restored automatically in the browser-local storage layer.
+JSON protocol, a worked example, safety constraints, and limits. Select
+**Workspace** in the app to create objects, apply compatible operations,
+inspect provenance, load executable examples, and import/export JSON snapshots.
+Snapshots are saved and restored automatically on this device. The desktop
+shell uses a stable loopback origin so work survives application restarts.
+The calculator tabs remain available alongside the typed workspace.
 
 ## Typeset working and worksheets
 

@@ -13,4 +13,9 @@ let vendor=false;
 try{await access(join(root,'vendor/pyodide/pyodide-lock.json'));vendor=true;}
 catch{if(process.argv.includes('--require-vendor'))throw Error('Offline Pyodide is missing. Run python3 scripts/vendor_pyodide.py');}
 if(vendor)await cp(join(root,'vendor/pyodide'),join(out,'vendor/pyodide'),{recursive:true});
+try{
+  await cp(join(root,'node_modules/katex/dist'),join(out,'assets/katex'),{recursive:true});
+}catch{
+  if(process.argv.includes('--require-vendor'))throw Error('Offline typesetting is missing. Run npm ci.');
+}
 console.log(`Calculator 2.0 website -> ${out}; Pyodide vendored: ${vendor}`);

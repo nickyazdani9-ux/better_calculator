@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15]
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.13'}
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: python scripts/vendor_pyodide.py
       - run: npm run build:native
       - run: npx playwright install --with-deps chromium
@@ -67,7 +67,7 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: python scripts/vendor_pyodide.py
       - run: npm run build:native
       - run: npx cap add android
@@ -103,7 +103,7 @@ jobs:
         with: {python-version: '3.13'}
       - uses: maxim-lobanov/setup-xcode@v1
         with: {xcode-version: '26.0'}
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: python scripts/vendor_pyodide.py
       - run: npm run build:native
       - run: npx cap add ios
@@ -142,6 +142,12 @@ jobs:
           - os: ubuntu-24.04-arm
             platform: linux
             arch: arm64
+          - os: windows-latest
+            platform: win
+            arch: x64
+          - os: windows-latest
+            platform: win
+            arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -149,13 +155,28 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.13'}
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: python scripts/vendor_pyodide.py
       - run: npm run build:native
       - name: Package Electron shell
         run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Verify native UI and capture screens
+        if: matrix.arch == 'x64' || matrix.os == 'macos-15'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a node scripts/capture-desktop.cjs
+          else
+            node scripts/capture-desktop.cjs
+          fi
+      - uses: actions/upload-artifact@v4
+        if: matrix.arch == 'x64' || matrix.os == 'macos-15'
+        with:
+          name: calculator2-screens-${{ matrix.platform }}-${{ matrix.arch }}
+          path: release/screens/
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: calculator2-desktop-${{ matrix.platform }}-${{ matrix.arch }}

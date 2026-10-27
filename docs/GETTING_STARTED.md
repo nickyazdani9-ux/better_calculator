@@ -8,7 +8,25 @@ In a built or hosted copy of Calculator 2.0, select **Calculus** → **Different
 
 **Add to worksheet** keeps the step; **Save as PDF** invokes browser print/save. **Use answer** can reuse a scalar's *text*, but does not preserve tensor or metric metadata. The current tabs are not yet the unified workspace interface. See the [repository setup](../README.md#quick-start-web) to build locally.
 
-## 2. Run a typed calculation
+## 2. Use the visible Workspace
+
+Select **Workspace** next to Calculator. Enter object name `f` and expression
+`x^3`, then select **Create object**. Under **Continue from a result**, choose
+source `f`, operation **Differentiate**, variable `x`, and result name `df`.
+Select **Apply operation** to obtain `3*x**2`, with a parent link to `f`.
+
+**Load example** runs a complete complex-field → geometry → probability
+calculation. Its final expectation is exactly `16` under the stated independent
+standard normal assumptions. The Fourier example demonstrates a separate
+cross-domain chain. Loading an example asks before replacing existing work.
+
+The app saves successful workspace changes on this device. **Export JSON**
+creates a portable copy; **Import JSON** replays and validates it atomically.
+Invalid imports preserve the current mathematical graph. Imported commands
+are recalculated; arbitrary Python and serialized result objects are not loaded.
+If device storage is unavailable, the status asks you to export a copy.
+
+## 3. Run a typed calculation in Python
 
 With the repository source available and Python installed, from the project root:
 
@@ -27,7 +45,7 @@ PY
 
 The second result has `ok: True` and `expr: "2*x"`. A **node** is a symbolic mathematical object with an ID. `define` creates `f`; `apply` uses it to create `df`; `get` examines `df` without altering anything.
 
-## 3. Chain across disciplines
+## 4. Chain across disciplines
 
 This Python batch moves from linear algebra into calculus:
 
@@ -47,7 +65,7 @@ print(w.nodes["h"].value)  # 12*t
 
 No mathematical subject has to be selected: output kind and context determine valid operations.
 
-## 4. Save the calculation
+## 5. Save the calculation
 
 ~~~python
 import json
