@@ -63,7 +63,7 @@ def vendor(base_url=BASE_URL, dest=ROOT / 'vendor/pyodide'):
     dest = Path(dest)
     for item in CORE:
         download(urllib.parse.urljoin(base_url, item), dest / item)
-    lock = json.loads((dest/'pyodide-lock.json').read_text())
+    lock = json.loads((dest/'pyodide-lock.json').read_text(encoding='utf-8'))
     for name, entry in packages_for(lock).items():
         filename = entry['file_name']
         download(urllib.parse.urljoin(base_url, filename), dest/filename, entry.get('sha256'))
