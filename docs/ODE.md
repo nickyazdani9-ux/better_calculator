@@ -25,4 +25,4 @@ For the repeated-root input the basis is `exp(x)` and `x*exp(x)`. For Bessel ord
 
 The public worker interface is `engine.run_json`. Its response exposes the same mathematical data under `extras`. Existing calculator domains retain their normal dependencies. SymPy is used as an independent substitution and Wronskian oracle in the ODE tests. The standalone Python solver has its own tests and the Lean module checks the mathematical identities underlying it.
 
-[Revised manuscript and formal companion](https://github.com/nickyazdani9-ux/mathematical-physics/pull/3) · [Pinned Lean source](https://github.com/nickyazdani9-ux/mathematical-physics/blob/8fca27f684eb320e043c3fc2bce4cc0b817de266/mathematics/riccati_odes/RiccatiZoo.lean)
+[Expanded paper (PDF)](https://github.com/nickyazdani9-ux/mathematical-physics/blob/26d6e54a4ebdc55be31a3ee1e7fed3abcc673809/mathematics/riccati_odes/riccati_paper.pdf) · [Checked Lean proofs](https://github.com/nickyazdani9-ux/mathematical-physics/blob/26d6e54a4ebdc55be31a3ee1e7fed3abcc673809/mathematics/riccati_odes/RiccatiZoo.lean) · [Manuscript review](https://github.com/nickyazdani9-ux/mathematical-physics/pull/3)
