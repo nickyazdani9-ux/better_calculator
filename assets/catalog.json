@@ -943,5 +943,89 @@
         ]
       }
     ]
+  },
+  {
+    "id": "ode",
+    "name": "Differential equations",
+    "icon": "sigma",
+    "operations": [
+      {
+        "id": "linear_second_order",
+        "label": "Second-order linear ODE",
+        "description": "Enter A y″ + B y′ + C y = 0 with rational coefficients in x.",
+        "fields": [
+          {
+            "key": "a",
+            "label": "A(x), coefficient of y″",
+            "default": "(1+x)^2",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "b",
+            "label": "B(x), coefficient of y′",
+            "default": "1+x",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "c",
+            "label": "C(x), coefficient of y",
+            "default": "-2",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "autonomous_riccati",
+        "label": "First-order Riccati ODE",
+        "description": "Solve dz/dx = a z² + b z + c with rational constants.",
+        "fields": [
+          {
+            "key": "a",
+            "label": "a",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "b",
+            "label": "b",
+            "default": "0",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "c",
+            "label": "c",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      },
+      {
+        "id": "coupled_modes",
+        "label": "Coupled-coordinate modes",
+        "description": "Solve the paper's cone equation after its phase shift, on 1+x > 0.",
+        "fields": [
+          {
+            "key": "ell",
+            "label": "Fourier index ℓ",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          },
+          {
+            "key": "m",
+            "label": "Coupling m",
+            "default": "1",
+            "kind": "text",
+            "hint": ""
+          }
+        ]
+      }
+    ]
   }
 ]

@@ -1,7 +1,7 @@
 /* Offline app shell + best-effort caching for the separately downloaded CAS runtime. */
-const VERSION='calculator2-shell-v6';
+const VERSION='calculator2-shell-v7';
 const RUNTIME='calculator2-runtime-v1';
-const CORE=['./','./index.html','./manifest.webmanifest','./assets/styles.css','./assets/catalog.json','./src/app.js','./src/workspace-storage.js','./src/registry.js','./src/worker.js','./icons/192.png','./icons/512.png','./python/engine.py','./python/workspace.py','./python/math_operations.py','./python/plugins.json','./python/plugins/__init__.py','./python/plugins/basic.py','./python/plugins/calculus.py','./python/plugins/complex_ops.py','./python/plugins/geometry.py','./python/plugins/waves.py','./python/plugins/linear.py'];
+const CORE=['./','./index.html','./manifest.webmanifest','./assets/styles.css','./assets/catalog.json','./src/app.js','./src/workspace-storage.js','./src/registry.js','./src/worker.js','./icons/192.png','./icons/512.png','./python/engine.py','./python/workspace.py','./python/math_operations.py','./python/riccati.py','./python/plugins/ode.py','./python/plugins.json','./python/plugins/__init__.py','./python/plugins/basic.py','./python/plugins/calculus.py','./python/plugins/complex_ops.py','./python/plugins/geometry.py','./python/plugins/waves.py','./python/plugins/linear.py'];
 CORE.push('./assets/studio.css','./src/studio.js','./assets/katex/katex.min.js','./assets/katex/katex.min.css');
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));

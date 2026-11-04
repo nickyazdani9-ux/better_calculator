@@ -27,3 +27,19 @@ test('entered fractions are typeset separately and results can be reused as step
   await page.locator('#reuse').click();
   await expect(page.locator('#fields [data-field-key="expression"]')).toHaveValue('(1/2)');
 });
+
+test('Riccati solver gives an Euler basis and a Bessel reduction in the actual worker', async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('#engine-indicator')).toHaveAttribute('data-state','ready');
+  await page.getByRole('tab',{name:'Differential equations'}).click();
+  await page.locator('#operation').selectOption('linear_second_order');
+  await page.locator('#run').click();
+  await expect(page.locator('#result-lines')).toContainText('Euler — solved');
+  await expect(page.locator('#result-math .katex')).toHaveCount(1);
+  for (const [key,value] of Object.entries({a:'x^2', b:'x', c:'x^2-4'})) {
+    await page.locator(`#fields [data-field-key="${key}"]`).fill(value);
+  }
+  await page.locator('#run').click();
+  await expect(page.locator('#result-lines')).toContainText('Bessel — reduced');
+  await expect(page.locator('#result-lines')).toContainText('dz/dx');
+});

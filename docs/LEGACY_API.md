@@ -78,3 +78,11 @@ For typed cross-domain workflows use the [unified API](API.md). For a first UI e
 | `eigenvectors` | Eigenvectors with algebraic multiplicities. | `matrix` = `[[2,0],[0,3]]` |
 | `multiply` | Multiply A × B. | `matrix` = `[[1,2],[3,4]]`; `other` = `[[5,6],[7,8]]` |
 
+## Differential equations (`ode`)
+
+| Operation ID | What it does | Input fields and defaults |
+| --- | --- | --- |
+| `linear_second_order` | Enter A y″ + B y′ + C y = 0 with rational coefficients in x. | `a` = `(1+x)^2`; `b` = `1+x`; `c` = `-2` |
+| `autonomous_riccati` | Solve dz/dx = a z² + b z + c with rational constants. | `a` = `1`; `b` = `0`; `c` = `1` |
+| `coupled_modes` | Solve the paper's cone equation after its phase shift, on 1+x > 0. | `ell` = `1`; `m` = `1` |
+

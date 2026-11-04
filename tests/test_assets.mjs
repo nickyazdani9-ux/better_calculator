@@ -9,7 +9,7 @@ const read=p=>readFileSync(new URL(p,root),'utf8');
 test('generated catalog includes every requested domain',()=>{
   const registry=JSON.parse(read('assets/catalog.json'));
   assert.ok(validateCatalog(registry));
-  assert.deepEqual(registry.map(x=>x.id),['basic','calculus','complex','geometry','waves','linear']);
+  assert.deepEqual(registry.map(x=>x.id),['basic','calculus','complex','geometry','waves','linear','ode']);
   assert.ok(registry.find(x=>x.id==='geometry').operations.length>=8);
 });
 
@@ -19,7 +19,7 @@ test('each declared mathematical plugin ships with source',()=>{
     assert.match(name,/^[a-z][a-z0-9_]*$/);
     assert.ok(existsSync(new URL(`python/plugins/${name}.py`,root)));
   }
-  assert.equal(modules.length,6);
+  assert.deepEqual(modules,['basic','calculus','complex_ops','geometry','waves','linear','ode']);
 });
 
 test('PWA manifest is installable and assets are cached',()=>{
@@ -29,7 +29,7 @@ test('PWA manifest is installable and assets are cached',()=>{
   assert.ok(manifest.icons.some(icon=>icon.sizes==='192x192'));
   assert.ok(manifest.icons.some(icon=>icon.sizes==='512x512'));
   const worker=read('sw.js');
-  for(const core of ['src/app.js','assets/catalog.json','src/workspace-storage.js','python/engine.py','python/workspace.py','python/math_operations.py','python/plugins/geometry.py','manifest.webmanifest']) {
+  for(const core of ['src/app.js','assets/catalog.json','src/workspace-storage.js','python/engine.py','python/workspace.py','python/math_operations.py','python/plugins/geometry.py','python/riccati.py','python/plugins/ode.py','manifest.webmanifest']) {
     assert.ok(worker.includes(core),`Offline shell missing ${core}`);
   }
 });
