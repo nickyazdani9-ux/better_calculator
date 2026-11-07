@@ -61,7 +61,7 @@ python -m pytest tests/native/test_native_parser.py tests/test_*.py -q
 python -m mypy --strict python/native_parser.py
 ```
 
-Validation on Python 3.12: 247 tests passed (80 native parser cases and 167
+Validation on Python 3.12: 249 tests passed (82 native parser cases and 167
 existing calculator cases); strict mypy passed against the installed native
 wheel with its PEP 561 marker, with no ignored imports. One unrelated installed
 AnyIO pytest-plugin deprecation warning was emitted.

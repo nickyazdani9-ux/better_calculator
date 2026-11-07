@@ -59,7 +59,7 @@ def _preflight(source: str) -> None:
                         raise NativeParseError("Nesting exceeds limit")
                 elif token.string in (')', ']', '}'):
                     depth -= 1
-    except (tokenize.TokenError, IndentationError) as exc:
+    except (tokenize.TokenError, IndentationError, UnicodeError) as exc:
         raise NativeParseError("Invalid expression syntax") from exc
 
 
@@ -81,7 +81,7 @@ def parse_native(source: str, names: Mapping[str, Symbol]) -> Expr:
     _preflight(source)
     try:
         tree = ast.parse(source, mode='eval')
-    except (SyntaxError, ValueError, RecursionError) as exc:
+    except (SyntaxError, ValueError, RecursionError, UnicodeError) as exc:
         raise NativeParseError("Invalid expression syntax") from exc
     pending: list[tuple[ast.AST, int]] = [(tree, 0)]
     count = 0

@@ -57,7 +57,7 @@ def test_names_are_explicit_not_constants_or_python_functions() -> None:
     # A call is a literal Apply to a supplied Symbol, never Python invocation.
     assert parse_native('f(x)', NAMES) == Apply(F, X)
 
-@pytest.mark.parametrize('source', ['', ' ', '\n', '(', 'x+'])
+@pytest.mark.parametrize('source', ['', ' ', '\n', '(', 'x+', '\ud800', '\x00'])
 def test_invalid_syntax(source: str) -> None:
     with pytest.raises(NativeParseError):
         parse_native(source, NAMES)
