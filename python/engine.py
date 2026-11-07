@@ -273,6 +273,9 @@ def calculate(request):
 def run_json(payload):
     """Only interface needed by Pyodide / browser worker."""
     request=json.loads(payload)
+    if request.get('action')=='workspace':
+        from workspace import execute
+        return json.dumps(execute(request))
     if request.get('action')=='catalog':
         return json.dumps({'ok':True,'catalog':operation_catalog()})
     return json.dumps(calculate(request))

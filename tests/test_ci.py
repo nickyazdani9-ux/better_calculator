@@ -21,6 +21,13 @@ class WorkflowTests(unittest.TestCase):
                          {'arm64','x86_64'})
         self.assertIn('ubuntu-24.04-arm',jobs['unit']['strategy']['matrix']['os'])
 
+    def test_windows_is_built_and_tested(self):
+        jobs=workflow('pipeline.yml')['jobs']
+        self.assertIn('windows-latest',jobs['unit']['strategy']['matrix']['os'])
+        targets=jobs['desktop']['strategy']['matrix']['include']
+        self.assertTrue({('win','x64'),('win','arm64')}.issubset(
+            {(item['platform'],item['arch']) for item in targets}))
+
     def test_deployment_and_tag_release_depend_on_tested_bundles(self):
         jobs=workflow('pipeline.yml')['jobs']
         self.assertIn('web',jobs['deploy-pages']['needs'])

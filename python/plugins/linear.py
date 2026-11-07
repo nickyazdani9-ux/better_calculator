@@ -1,4 +1,5 @@
 import sympy as sp
+from math_operations import matrix_inverse, matrix_transpose, matrix_multiply
 from engine import register,field,parse_matrix
 TAB=('linear','Linear algebra','grid')
 def reg(op,label,desc,fields):return register(*TAB,op,label,desc,fields)
@@ -6,9 +7,9 @@ M=field('matrix','Matrix','[[1,2],[3,4]]',kind='textarea')
 @reg('determinant','Determinant','Exact determinant.',[M])
 def determinant(v):return parse_matrix(v.get('matrix','')).det()
 @reg('inverse','Inverse','Matrix inverse.',[M])
-def inverse(v):return parse_matrix(v.get('matrix','')).inv()
+def inverse(v):return matrix_inverse(parse_matrix(v.get('matrix','')))
 @reg('transpose','Transpose','Transpose a matrix.',[M])
-def transpose(v):return parse_matrix(v.get('matrix','')).T
+def transpose(v):return matrix_transpose(parse_matrix(v.get('matrix','')))
 @reg('eigenvalues','Eigenvalues','Eigenvalues and multiplicities.',[field('matrix','Matrix','[[2,0],[0,3]]',kind='textarea')])
 def eigenvalues(v):
     m=parse_matrix(v.get('matrix',''))
@@ -22,4 +23,4 @@ def eigenvectors(v):
     if m.rows!=m.cols:raise ValueError('Eigenvectors require a square matrix.')
     return {'lines':[f'λ = {val}; multiplicity {mult}; basis {basis}' for val,mult,basis in m.eigenvects()]}
 @reg('multiply','Matrix multiplication','Multiply A × B.',[M,field('other','Matrix B','[[5,6],[7,8]]',kind='textarea')])
-def multiply(v):return parse_matrix(v.get('matrix',''))*parse_matrix(v.get('other',''))
+def multiply(v):return matrix_multiply(parse_matrix(v.get('matrix','')),parse_matrix(v.get('other','')))

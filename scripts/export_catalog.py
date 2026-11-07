@@ -4,5 +4,5 @@ import json,sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'python'))
 from engine import operation_catalog
-(ROOT/'assets/catalog.json').write_text(json.dumps(operation_catalog(),ensure_ascii=False,indent=2)+'\n')
+(ROOT/'assets/catalog.json').write_text(json.dumps(operation_catalog(),ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='\n')
 print('Updated assets/catalog.json')
