@@ -1,0 +1,25 @@
+test_archive_duplicates_rejected (test_artifact_inventory.ArtifactInventoryTests.test_archive_duplicates_rejected) ... ok
+test_archive_symlink_rejected (test_artifact_inventory.ArtifactInventoryTests.test_archive_symlink_rejected) ... ok
+test_archive_unsafe_paths_rejected (test_artifact_inventory.ArtifactInventoryTests.test_archive_unsafe_paths_rejected) ... ok
+test_bad_revision_rejected (test_artifact_inventory.ArtifactInventoryTests.test_bad_revision_rejected) ... ok
+test_changes_in_actual_file_bytes_change_hash (test_artifact_inventory.ArtifactInventoryTests.test_changes_in_actual_file_bytes_change_hash) ... ok
+test_cli_refuses_output_inside_artifact_without_writing (test_artifact_inventory.ArtifactInventoryTests.test_cli_refuses_output_inside_artifact_without_writing) ... ok
+test_cli_reports_missing_evidence_and_nonzero_status (test_artifact_inventory.ArtifactInventoryTests.test_cli_reports_missing_evidence_and_nonzero_status) ... ok
+test_cli_writes_outside_artifact (test_artifact_inventory.ArtifactInventoryTests.test_cli_writes_outside_artifact) ... ok
+test_corrupt_wheel_rejected (test_artifact_inventory.ArtifactInventoryTests.test_corrupt_wheel_rejected) ... ok
+test_deterministic_sorted_files_and_supplied_revision (test_artifact_inventory.ArtifactInventoryTests.test_deterministic_sorted_files_and_supplied_revision) ... ok
+test_directory_symlink_rejected (test_artifact_inventory.ArtifactInventoryTests.test_directory_symlink_rejected) ... ok
+test_empty_metadata_and_wheel_remain_missing_evidence (test_artifact_inventory.ArtifactInventoryTests.test_empty_metadata_and_wheel_remain_missing_evidence) ... ok
+test_evidence_member_size_is_bounded (test_artifact_inventory.ArtifactInventoryTests.test_evidence_member_size_is_bounded) ... ok
+test_extra_dist_info_directory_rejected (test_artifact_inventory.ArtifactInventoryTests.test_extra_dist_info_directory_rejected) ... ok
+test_filesystem_symlink_rejected (test_artifact_inventory.ArtifactInventoryTests.test_filesystem_symlink_rejected) ... ok
+test_missing_and_empty_notices_are_explicit (test_artifact_inventory.ArtifactInventoryTests.test_missing_and_empty_notices_are_explicit) ... ok
+test_missing_directory_rejected (test_artifact_inventory.ArtifactInventoryTests.test_missing_directory_rejected) ... ok
+test_missing_wheel_metadata_and_notice_are_explicit (test_artifact_inventory.ArtifactInventoryTests.test_missing_wheel_metadata_and_notice_are_explicit) ... ok
+test_split_dist_info_directories_rejected (test_artifact_inventory.ArtifactInventoryTests.test_split_dist_info_directories_rejected) ... ok
+test_wheel_evidence_hashes_without_executing_or_extracting (test_artifact_inventory.ArtifactInventoryTests.test_wheel_evidence_hashes_without_executing_or_extracting) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.135s
+
+OK

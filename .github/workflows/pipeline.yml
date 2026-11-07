@@ -44,6 +44,14 @@ jobs:
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: python scripts/vendor_pyodide.py
       - run: npm run build:native
+      - name: Inventory exact web artifact bytes and notices
+        run: python scripts/artifact_inventory.py dist --output "$RUNNER_TEMP/calculator2-web-inventory.json" --source-revision "$GITHUB_SHA"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calculator2-web-inventory
+          path: ${{ runner.temp }}/calculator2-web-inventory.json
+          if-no-files-found: error
+          retention-days: 14
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - uses: actions/upload-artifact@v4

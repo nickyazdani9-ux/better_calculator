@@ -22,3 +22,16 @@ Remaining release review: inventory and verify all runtime/stdlib, wheel,
 font and native-shell notices and source obligations in the actual packaged
 artifacts. This patch is not complete third-party licence clearance. Native
 CAS_AZEEM is not included or relicensed by this notice set.
+
+## Artifact evidence tool
+
+`python scripts/artifact_inventory.py dist --output /tmp/inventory.json
+--source-revision FULL_COMMIT_SHA` records every built file hash and selected
+wheel metadata/notice hashes without executing or extracting wheel contents.
+Run the command on one line after the build. Web CI retains a separate
+`calculator2-web-inventory` receipt.
+
+[Implementation and test evidence](../docs/validation/ARTIFACT-INVENTORY-20261107.md)
+records the current acceptance state. The receipt is not licence clearance,
+metadata authenticity, complete runtime validation or a source attestation.
+Missing evidence and outstanding source/notice review remain explicit.

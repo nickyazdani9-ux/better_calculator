@@ -1,0 +1,36 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> calculator-2@0.3.0 test:js
+> node --test tests/*.mjs
+
+✔ generated catalog includes every requested domain (2.462056ms)
+✔ each declared mathematical plugin ships with source (0.618361ms)
+✔ PWA manifest is installable and assets are cached (0.496982ms)
+✔ frontend uses escaped DOM text for results, no innerHTML (0.261184ms)
+✔ static desktop host serves assets with correct WASM MIME and prevents traversal (70.010666ms)
+✔ web build copies only required public files (123.338564ms)
+✔ native wrappers and workflows are present (3.883478ms)
+✔ native targets require offline Pyodide and do not ship tests (1.724369ms)
+✔ catalog validation checks metadata (1.085768ms)
+✔ registry resolves operations and defaults (0.990579ms)
+✔ unknown operations do not execute (0.160646ms)
+✔ history formats safely (0.282857ms)
+✔ release artifact preserves exact project and dependency notices (127.221636ms)
+✔ release refuses missing LICENSE (76.841429ms)
+✔ release refuses missing node_modules/katex/LICENSE (83.43085ms)
+✔ release refuses missing licenses/PYODIDE-LICENSE (67.618158ms)
+✔ failed preflight preserves existing output when vendor/pyodide/pyodide-lock.json is absent (58.294501ms)
+✔ failed preflight preserves existing output when node_modules/katex/dist is absent (61.131959ms)
+✔ failed preflight preserves existing output when index.html is absent (63.730965ms)
+✔ roundtrips versioned mathematical commands across sessions (2.407384ms)
+✔ does not hydrate corrupt or unsupported snapshots (0.688153ms)
+✔ rejects excessively large storage payloads (0.504052ms)
+✔ Fourier and directional limit commands survive saving and restoration (0.35971ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 647.362511
