@@ -12,7 +12,7 @@ import re
 import sympy as sp
 import math_operations as core
 
-from engine import parse_math, parse_matrix
+from engine import CONSTANTS, FUNCTIONS, parse_math, parse_matrix
 
 NAME = re.compile(r'[A-Za-z][A-Za-z0-9_]{0,20}\Z')
 NODE_ID = re.compile(r'[a-z][a-z0-9_]{0,31}\Z')
@@ -26,7 +26,7 @@ ALL_KINDS = frozenset({'scalar', 'scalar_field', 'vector', 'covector', 'matrix',
 
 
 def symbol(token, *, real=False):
-    if not isinstance(token, str) or not NAME.fullmatch(token) or token in {'I','E','pi','oo','inf'}:
+    if not isinstance(token, str) or not NAME.fullmatch(token) or token in CONSTANTS or token in FUNCTIONS:
         raise ValueError('Expected a simple symbolic variable name.')
     return sp.Symbol(token, real=True) if real else sp.Symbol(token)
 
