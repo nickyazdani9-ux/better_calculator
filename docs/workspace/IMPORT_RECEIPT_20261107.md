@@ -26,3 +26,13 @@ This is a source-preserving recovery of Claude's R3 v3 merge documents plus R21 
 ## Next
 
 Review this docs-only PR into feature/unified-math-workspace. Reconcile the v4 mirrors and per-operation fates using the actual source and dated rulings, while native package validation proceeds independently. Do not merge this handoff directly to main.
+
+## V4 mirror follow-through — 7 November 2026
+
+Following recovery integration at `7ab5d082e3d43c2d53fb171022fa8b4f763320e5`, SPEC, CONSTRAINTS, MILESTONES and INDEX are reconciled to the decisions already recorded in STATE v4. The original imported versions remain at that commit; STATE.md remains byte-for-byte unchanged (10911 bytes, MD5 above). This is a documentation mirror, not a new mathematical ruling or proof of implementation.
+
+Mirrored: wheel/no-monorepo boundary, workspace projection over the CAS edge log, plotting-only NumPy, labelled unsupported features, delegated design review, retained Windows target and W3/W4 work status. The live native namespace is `cas`; planned `cas_azeem.plot` and licence names do not trigger a silent rename. Old per-item approval and absent-source blockers are removed from the active mirrors.
+
+Remaining: current per-operation inventory, browser/native adapter implementation and acceptance, plotting/billing implementation, final licence terms and exact original native completion-plan text. W1 is not closed solely by this mirror.
+
+Current status interpretation is recorded separately in RECONCILIATION_20261107.md. The historical STATE snapshot is not rewritten.

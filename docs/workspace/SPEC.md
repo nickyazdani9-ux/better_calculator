@@ -1,6 +1,6 @@
 # SPEC — CAS_AZEEM × Calculator 2.0: the merge
 
-Last updated: 2026-10-27 (v3 — rebased on `d3263cf`; 13:27 rulings folded in) · Settled: §1, §3 · Open: §4.2–4.5 · Proposed: §4.6
+Last updated: 2026-11-07 (v4 mirror) · §4.2–4.5 and §6 ruled in STATE.md on 7 November · §4.6 is implementation work, not a completion claim
 
 ## 0 Authority and scope
 
@@ -10,11 +10,11 @@ This file governs **the merge only**: how Calculator 2.0 (this repo) becomes the
   - Readable copy: Drive "CAS_AZEEM — spec pack for Right Hand", doc 01, which is a verbatim extraction.
   - It holds G1–G9, decisions D1–D3, the number system, the kernel, the §6 code-generation constraints and the perimeter.
 - **Engine truth**: `STATE.md` in the CAS_AZEEM repo.
-  - The repo lives on Nick's machine. Its remote URL is Nick's to confirm (ATL-352).
+  - Native source is available at https://github.com/nickyazdani9-ux/CAS_AZEEM. Its imported snapshot does not restore original Git ancestry; see IMPORT_RECEIPT_20261107.md.
   - Its 17 Aug snapshot is doc 02 (verbatim). The state after August is in doc 03.
 - **Precedence**, which is the CAS rule: the newer dated text wins, and the design record outranks orientation. Where this file and the CAS sources disagree on the engine, the CAS sources win and this file is fixed.
 - **Identifiers**: the CAS identifiers (G1–G9, D1–D3, M0–M9, §6.n) keep their meaning everywhere. Merge-only identifiers carry a **W** prefix (§5).
-- **Exchange scope** (CLAUDE-NOTE-20261027-04): this spec is drafted by Claude with Nick. The Right Hand executes administration and does not edit or rule on it.
+- **Exchange scope**: the 7 November delegation in STATE.md supersedes CLAUDE-NOTE-20261027-04's execution-only role. Claude and Right Hand make and record proxy decisions without per-item owner approval.
 
 v1 of this file (27 Oct, morning) was reconstructed from memory before the sources were reachable. Its numbering is retired in §5.
 
@@ -35,7 +35,7 @@ The product's north star (owner, 27 Oct 13:27) is a full ODE-solving library: an
 These continue the CAS numbering. G1–G9 are unchanged `[CAS v0.3 §1.2]`.
 
 - **G10 — One workspace.** Calculator 2.0's front end runs on CAS_AZEEM. No external system computes anything at runtime on any engine path; SymPy and any other external checker remain as test-time cross-checks only (owner, 27 Oct; scope widened 13:27). Served by W1–W2.
-- **G11 — The best plotting of any CAS.** This means Matplotlib (including mplot3d) and Seaborn, through the plotting extra (owner, 27 Oct). Served by W3. The checkable measure is ⟨open⟩, §4.5.
+- **G11 — The best plotting of any CAS.** This means Matplotlib (including mplot3d) and Seaborn, through the plotting extra (owner, 27 Oct). Served by W3. The accepted measure is in §4.5; this is a target, not a claim of superiority.
 
 ## 3 What carries over from the engine unchanged
 
@@ -63,44 +63,31 @@ The calculator already isolates its engine. `src/worker.js` runs Pyodide in a we
 
 Input goes through a guarded `ast` walker, with no `eval` or `exec`. The authoritative contract for today's engine is docs/API.md. The typed graph is described in docs/UNIFIED_WORKSPACE.md.
 
-### 4.2 Boundary shape ⟨open⟩ — Constraint 3 class (layering) — ATL-373
+### 4.2 Package boundary — settled 7 November — ATL-373
 
-The CAS_AZEEM core is stdlib-only, so it runs in the same Pyodide worker with no `loadPackage`. The candidate, not ruled, is to keep `run_json` and swap what sits behind it, feature by feature, in W1's order.
+CAS_AZEEM is consumed as a wheel built from the separate engine repository and vendored into the Pyodide bundle at build time. No monorepo and no copied engine implementation in the shell. Keep `run_json` as the front-end boundary and replace supported operations feature by feature.
 
-How the calculator consumes CAS_AZEEM is still to rule (doc 03 [O]). The options are a package dependency, a vendored copy or a monorepo.
+The engine repository's STATE.md remains authoritative for engine behavior. Its current installed namespace is `cas`; design references to `cas_azeem.plot` and `cas_azeem.licence` describe planned interfaces, not existing modules or an authorised mechanical rename. Native wheel packaging exists; browser vendoring and adapter acceptance are separate work.
 
-### 4.3 Workspace graph versus the derivation DAG ⟨open⟩ — Constraint 3 class (identity)
+### 4.3 Workspace graph and derivation DAG — settled 7 November
 
-The workspace keeps a typed node graph:
-- each node carries its parents, operation and context;
-- the graph is exported as a replayable command history (`calculator2.workspace` v1).
+The workspace graph is a front-end projection over the native CAS edge log. A workspace node stores the content hash of its value; the CAS DAG is the sole derivation record. Preserve context and replay at the front end without inventing a second mathematical provenance log.
 
-CAS keeps an edge log keyed by content hash. The provisional persistence is `edges.jsonl` plus `objects.jsonl`, with explicit save and load (doc 03 [P]).
+The provisional `edges.jsonl` / `objects.jsonl` persistence proposal remains unimplemented unless verified against the engine; this graph ruling does not implement persistence.
 
-The question is whether a workspace node becomes a content hash with its edges in the CAS log, or whether the graph stays a front-end projection over the log.
+### 4.4 Numerical and plotting boundary — settled 7 November
 
-### 4.4 NumPy and SciPy after the oracle rulings ⟨open⟩
+Option (c) was accepted: NumPy is allowed only in the plotting extra at the drawing boundary. `cas.numeric` and `lower()` are deferred to v1.x and will be stdlib-only or a C extension. The earlier provisional NumPy-lowering proposal is superseded.
 
-The 27 Oct rulings say external systems are cross-checks only. The 13:27 form is that CAS_AZEEM is the only engine that produces results, and no external system computes anything at runtime. Two earlier records assumed otherwise:
-- the 13 Aug decision placed NumPy and SciPy in `cas.numeric` as an optional extra;
-- the 22 Sep provisional `lower(expr)` lowers to NumPy callables (doc 03 [P]).
+No external system computes on an engine path. External systems remain test-time oracles with recorded tool, method and outcome. Numerical simulation proposals in COMMERCIAL_ROADMAP.md do not override this boundary.
 
-Options:
-- (a) `cas.numeric` is outside "engine" and keeps NumPy and SciPy;
-- (b) `cas.numeric` is rebuilt stdlib-only, or deferred;
-- (c) NumPy is permitted in `cas.plot` only, at the drawing boundary, which is RELAY-04's reading.
+### 4.5 Plotting extra (W3) — design settled; implementation open — ATL-375
 
-Claude's reading ⟨verify⟩: the 13:27 wording tells against (a) and leaves (b) and (c) standing. That is a reading, not a ruling. This needs Nick.
+The closed plotting import list is Matplotlib, mpl_toolkits.mplot3d, Seaborn and NumPy. Floats enter only at the drawing boundary; exact kernel arithmetic remains unchanged.
 
-The repo's `docs/COMMERCIAL_ROADMAP.md` (new at `d3263cf`) lists, at P1, an error-controlled numerical ODE solver for interactive simulation. Whatever §4.4 rules decides how that row is built.
+Accepted measure: **no plot draws across a pole, branch cut or asymptote the kernel already knows**. Enforce this per plot type in `tests/plot/`. This does not claim detection of every unknown singularity.
 
-### 4.5 Plotting extra (W3) — Proposed — ATL-375
-
-`cas_azeem.plot` may import Matplotlib, mpl_toolkits.mplot3d, Seaborn, and NumPy (because Matplotlib requires it).
-- Floats enter only at the drawing boundary, so `[CAS v0.3 §6.11]` holds.
-- All of these run in Pyodide, so the same extra serves the browser builds ⟨verify⟩ (check the Pyodide 0.29.5 package list).
-
-The proposed checkable measure for "best" (RELAY-04) is that **no plot draws across a pole, branch cut or asymptote the kernel already knows**. This needs Nick to accept it or set another measure.
+W3 may proceed independently of native M4 because it touches no kernel code. Actual Pyodide package availability and browser acceptance remain to be verified; the design ruling is not deployment evidence.
 
 ### 4.6 Front-end plumbing — Proposed
 
@@ -128,21 +115,21 @@ The v1 identifiers were referenced in SUBMIT notes, Linear and email, so they ar
 | ~~G6 plotting~~ (RELAY-04) | G11 (G6 is CAS: source-available) |
 | ~~§5.1–5.6 restated kernel~~ | `[CAS v0.3 §5]` and doc 02 |
 
-## 6 Open for Nick (batched; Claude raises these directly, never through the exchange)
+## 6 Recorded batch rulings — 7 November 2026
 
-Linear IDs are where each item is filed for Nick; the ruling lands here and in STATE.md Decisions.
+Authority: STATE.md Decisions (verbatim source preserved from the Claude Project) and ATL-313 comment `484115d8-6859-4ec5-b335-3607a6eceaf4`. This mirror records settled choices; it does not add new mathematical rulings.
 
-1. §4.2 — how the calculator consumes CAS_AZEEM (package, vendored or monorepo). ATL-373.
-2. §4.3 — the workspace graph versus the DAG.
-3. §4.4 — NumPy and SciPy after the oracle rulings.
-4. §4.5 — the measure for "best plotting". ATL-375.
-5. Regression tolerance during W2: ship with features missing, or hold until parity. ATL-372.
-6. Licence and pricing. ATL-369.
-   - This repo is MIT, while CAS G6 is source-available, so code already published here stays MIT.
-   - The options are to keep the shell MIT and licence CAS_AZEEM separately, or to relicense future versions.
-   - `docs/COMMERCIAL_ROADMAP.md` (27 Oct) proposes test prices of A$29/49/79 one-off and A$8/12/18 a month. The 13 Aug model is free noncommercial, a 40-day evaluation and a commercial seat licence (provisionally $995 per seat per year). They may describe different tiers; nothing on record says so ⟨open⟩.
-   - Counsel is pending in any case.
-7. Windows. This repo ships Windows targets (docs/CROSS_PLATFORM.md; `d3263cf` adds Windows previews). A note from memory said no Windows. Confirm which is intended.
-8. The veto window on the 22 Sep proxy rulings P1, P2, P4 and P7 (doc 03 §3). ATL-368. It closes at first use, which is CAS M4.
+| Item | Recorded decision |
+|---|---|
+| §4.2 / ATL-373 | Separate engine wheel, vendored into the browser bundle; no monorepo. |
+| §4.3 | Workspace graph projects the CAS edge log; content hashes identify values. |
+| §4.4 | NumPy only in plotting; numerical lowering deferred to v1.x. |
+| §4.5 / ATL-375 | Do not draw across kernel-known poles, branch cuts or asymptotes. |
+| Regression tolerance / ATL-372 | Ship W2 feature by feature. Unsupported features show “not available in CAS_AZEEM v1.0”; never silently fall back to an external engine. |
+| Licence / ATL-369 | Shell MIT; CAS source-available and separately licensed. Consumer and commercial seat offerings are tiers of one model. Final terms remain a release gate. |
+| Windows | Retained as a build target. |
+| P1/P2/P4/P7 / ATL-368 | The veto window is closed and the proxy rulings stand. Their original text is still needed for faithful native-plan application; this table does not reconstruct it. |
 
-Structura has no record anywhere (doc 03; ATL-370). It is not reconstructed.
+W4 is open: one billing hub and processor account, per-product storefronts, and an engine-side signed-token check. The STATE interface `cas_azeem.licence.check(token) -> Tier` is a design shape only. Processor activation, final terms and implementation remain unverified. The quoted prices are proposals, not validated revenue.
+
+Structura remains outside scope; it is not reconstructed. The exact native completion-plan files remain missing under ATL-353 / Hub O15. That does not block independent parser, packaging or documentation work with available contracts.

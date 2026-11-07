@@ -1,6 +1,6 @@
 # CONSTRAINTS — CAS_AZEEM × Calculator 2.0: the merge
 
-Last updated: 2026-10-27 (v3)
+Last updated: 2026-11-07 (v4 mirror of STATE.md Decisions; historical import retained in Git)
 
 The engine's code-generation constraints are `[CAS v0.3 §6.1–6.15]`. Drafted constraints 16–18 are pending in the 22 Sep plan (doc 03):
 - 16 — accelerator doctrine;
@@ -9,22 +9,15 @@ The engine's code-generation constraints are `[CAS v0.3 §6.1–6.15]`. Drafted 
 
 They bind any code that touches CAS_AZEEM, including code generated from this repo. This file adds only what the merge needs, and keeps v1's numbering where it was referenced.
 
-## Roles
+## Roles and decision recording
 
-- **Owner (Nick).** Rules on design and authorises pushes. On the merge he is consulted only for the batch in SPEC §6, and for deadlocks between agents.
-- **Coordinator (Right Hand).** Execution only on CAS work (CLAUDE-NOTE-20261027-04):
-  - Linear per doc 03 §5;
-  - repository administration and history preservation per doc 03 §6;
-  - registration of the data.
-  It does not draft, edit, interpret or rule on this spec. It owns AWS provisioning (GOV-CLOUD-001).
-- **Proxy (Claude).** Drafts this spec with Nick and builds per brief. Also the skeptic PR reviewer (SUBMIT-002).
-  - It has read-only access to this repo. It delivers branches as git bundles, and the Right Hand pushes them.
+The 7 November full-delegation ruling in STATE.md supersedes the older execution-only and per-item owner approval roles.
 
-## Deadlock rule (administrative matters only)
-
-- One written round: each side gives its case in five lines or fewer, and says what it forks.
-- If that does not settle it, it goes to Nick as one batched question.
-- Spec questions never enter this rule. Claude takes them to Nick directly.
+- **Owner (Nick).** Sets goals. Only actions requiring his identity or account control return to him (for example financial-account opening); routine design, implementation and reviewed integration decisions are delegated.
+- **Claude (proxy) and Right Hand.** Make and record design decisions within the existing mathematical constraints. A decision must cite the affected invariant, rationale and acceptance evidence. No silent change to node identity, hashing, layering or licensing.
+- **Implementer and reviewer.** Use separate review where available, one writer per branch, exact source revisions and explicit acceptance. A missing acknowledgement is never approval or proof of execution.
+- **Access.** Repository access is verified per connector. The native source is available; Claude's independent access must not be inferred from Right Hand access. See IMPORT_RECEIPT_20261107.md.
+- **Unresolved source gaps.** Preserve missing original-plan text as a gap. Do not manufacture the 22 September plan from summaries; continue independent work whose contract is available.
 
 ## Constraints
 
@@ -32,7 +25,7 @@ They bind any code that touches CAS_AZEEM, including code generated from this re
 2. **Docs in the same commit as the change.**
    - Exception ⟨open⟩: `docs/LEGACY_API.md` is generated and test-enforced in this repo.
    - Proposal: it retires with the legacy tabs at W2. The CAS no-autogeneration rule (16 Aug) binds the CAS repo's `api/`.
-3. **Escalation** — `[CAS v0.3 §6.3]`, plus the front-end/engine boundary (SPEC §4.2) and graph identity (§4.3).
+3. **Design review and recorded proxy rulings** — `[CAS v0.3 §6.3]` classes, including the front-end/engine boundary (SPEC §4.2) and graph identity (§4.3), now go to Claude and Right Hand under the 7 November delegation. Record the ruling and tests; no per-item owner approval. D1, exact arithmetic and provenance remain requirements.
 4. **Gates.** Green at every commit:
    - this repo's suites;
    - CAS's mypy --strict;
@@ -42,11 +35,11 @@ They bind any code that touches CAS_AZEEM, including code generated from this re
 5. **Imports — closed list** (owner, 27 Oct; RELAY-04; widened 13:27).
    - Engine paths (CAS core and the workspace back end): stdlib only.
    - CAS_AZEEM is the only engine that produces results. No external system computes anything at runtime.
-   - External checkers — SymPy, Mathematica/Wolfram, Maple and any other — run at test or verification time only. In this repo, SymPy (and NumPy or SciPy, if ever used) lives in `tests/oracle/` only.
+   - External checkers — SymPy, Mathematica/Wolfram, Maple and any other — run at test or verification time only. In this repo, SymPy and SciPy live in `tests/oracle/` only. NumPy has the separate plotting-only allowance below; it is not an engine dependency.
    - Every cross-check is recorded: which tool checked what, by what method (symbolic, or numerical such as random-point evaluation), and whether it agreed. Nothing is checked silently. This extends CAS constraint 10 (`tests/oracle.py`) from SymPy to any external checker.
    - `cas_azeem.plot` (W3): Matplotlib, mpl_toolkits.mplot3d, Seaborn and NumPy, and nothing else.
-   - Any addition escalates.
-   - The status of `cas.numeric` is ⟨open⟩, SPEC §4.4.
+   - Any addition requires a recorded proxy design ruling.
+   - `cas.numeric` and `lower()` are deferred to v1.x; they will be stdlib-only or a C extension. NumPy is permitted only at the plotting boundary (SPEC §4.4). The installed native package currently imports as `cas`; the design name `cas_azeem.plot` does not rename existing modules or prove that extra exists.
 6. **Ambient state** — closed per the CAS 17 Aug ruling: the session log and the derivative registry. Nothing in the front end adds to it.
 7. **Source discipline.** Anything not read from a source carries ⟨verify⟩. Gaps go to SPEC §6, never invented.
 8. **Cloud** (proposal). No resource exists before GOV-CLOUD-001 C1–C8, an owner cap and alarms are in place.
@@ -58,4 +51,4 @@ They bind any code that touches CAS_AZEEM, including code generated from this re
   - noncommercial free forever;
   - a 40-day commercial evaluation per entity;
   - a paid commercial licence, provisionally $995 per seat per year (doc 03 [R]).
-- This repo is MIT today, and `docs/COMMERCIAL_ROADMAP.md` proposes separate consumer test prices. Both are SPEC §6, item 6.
+- The shell stays MIT and CAS_AZEEM is licensed separately under the source-available model (STATE.md, 7 November). Consumer and seat prices are tiers of one proposed model, not proof of payment validation. Draft licence text remains a release gate; this mirror neither activates it nor grants clearance.
