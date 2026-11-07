@@ -74,3 +74,7 @@ order; no special-case “Fourier → matrix” workflow was implemented.
 For contrast, taking `norm_squared` without a metric, adding tensor components expressed in incompatible charts, or contracting a tensor with two upper indices must return an error. **Rejecting invalid mathematics is part of the contract.** See [Troubleshooting](TROUBLESHOOTING.md).
 
 More examples should be added with each new supported operation, accompanied by a regression test. Exact request fields are in the [API reference](API.md).
+
+## Euler and Bessel side by side
+
+In **Differential equations → Second-order linear ODE**, evaluate `(1+x)^2, 1+x, -2` as the three coefficient fields. Then try `x^2, x, x^2-4`. The first gives a pair of modes. The second gives the Riccati equation for Bessel order two. [Run the Python example and inspect both results](ODE.md).

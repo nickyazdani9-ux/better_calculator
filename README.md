@@ -1,5 +1,7 @@
 # Calculator 2.0
 
+The **Differential equations** tab solves constant-coefficient and shifted Euler equations, reduces classical variable-coefficient examples to Riccati form, and includes the coupled-coordinate modes. [Examples and proof links](docs/ODE.md).
+
 ## Documentation — start here
 
 New to the calculator? Follow the [documentation index](docs/README.md).

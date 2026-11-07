@@ -230,3 +230,11 @@ Current limits: expressions ≤500 characters and approximately 120 parser AST n
 The original API is `{"tab":"calculus","operation":"differentiate","values":{...}}`. It returns `ok`, `expr`, `latex`, `text`, `lines`, `extras`, `inputs`, and `reusable`, not typed workspace nodes. `{"action":"catalog"}` returns its complete operation registry. See [Legacy API](LEGACY_API.md) for exact names, fields and defaults.
 
 No automatic bridge presently promotes every legacy output into a typed workspace node. That integration is future M1 work.
+
+## Differential-equation calculator
+
+The `ode` tab exposes `linear_second_order`, `autonomous_riccati` and `coupled_modes` through the browser worker. The machine-readable result is in `extras`. See [the ODE grammar, interval conditions and solver results](ODE.md).
+
+~~~json
+{"tab":"ode","operation":"linear_second_order","values":{"a":"x^2","b":"x","c":"x^2-4"}}
+~~~
