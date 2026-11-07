@@ -12,11 +12,14 @@ for (const file of ['LICENSE','licenses/PYODIDE-LICENSE',
   ...(process.argv.includes('--require-vendor') ? ['node_modules/katex/LICENSE'] : [])]) {
   if (!(await readFile(join(root,file),'utf8')).trim()) throw Error(`Empty release notice: ${file}`);
 }
-await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
-for(const file of required){await cp(join(root,file),join(out,file),{recursive:true});}
+// Check known required inputs before replacing a previously built artifact.
+for(const file of required) await access(join(root,file));
 let vendor=false;
 try{await access(join(root,'vendor/pyodide/pyodide-lock.json'));vendor=true;}
 catch{if(process.argv.includes('--require-vendor'))throw Error('Offline Pyodide is missing. Run python3 scripts/vendor_pyodide.py');}
+if(process.argv.includes('--require-vendor')) await access(join(root,'node_modules/katex/dist'));
+await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});
+for(const file of required){await cp(join(root,file),join(out,file),{recursive:true});}
 if(vendor)await cp(join(root,'vendor/pyodide'),join(out,'vendor/pyodide'),{recursive:true});
 try{
   await cp(join(root,'node_modules/katex/dist'),join(out,'assets/katex'),{recursive:true});

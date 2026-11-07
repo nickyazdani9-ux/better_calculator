@@ -24,3 +24,11 @@ test('release artifact preserves exact project and dependency notices', async ()
 for(const missing of ['LICENSE','node_modules/katex/LICENSE','licenses/PYODIDE-LICENSE']) test(`release refuses missing ${missing}`, async () => fixture(async root => {
   await rm(join(root,missing)); const result=build(root); assert.notEqual(result.status,0,'missing notice must fail release build');
 }));
+for(const missing of ['vendor/pyodide/pyodide-lock.json','node_modules/katex/dist','index.html']) test(`failed preflight preserves existing output when ${missing} is absent`, async () => fixture(async root => {
+  await mkdir(join(root,'dist'));
+  await writeFile(join(root,'dist','previous.html'),'previous verified artifact');
+  await rm(join(root,missing),{recursive:true});
+  const result=build(root);
+  assert.notEqual(result.status,0,'missing build input must fail');
+  assert.equal(await readFile(join(root,'dist','previous.html'),'utf8'),'previous verified artifact');
+}));
