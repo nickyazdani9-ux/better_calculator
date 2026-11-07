@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import tempfile
 import urllib.parse
 import urllib.request
@@ -64,9 +65,18 @@ def vendor(base_url=BASE_URL, dest=ROOT / 'vendor/pyodide'):
     for item in CORE:
         download(urllib.parse.urljoin(base_url, item), dest / item)
     lock = json.loads((dest/'pyodide-lock.json').read_text(encoding='utf-8'))
-    for name, entry in packages_for(lock).items():
+    packages = packages_for(lock)
+    # Validate the entire dependency closure before downloading any wheel.
+    # Missing metadata must never silently disable checksum verification.
+    hashes = {}
+    for name, entry in packages.items():
+        digest = entry.get('sha256')
+        if not isinstance(digest, str) or not re.fullmatch(r'[0-9a-fA-F]{64}', digest):
+            raise ValueError(f'Invalid SHA256 for Pyodide package: {name}')
+        hashes[name] = digest.lower()
+    for name, entry in packages.items():
         filename = entry['file_name']
-        download(urllib.parse.urljoin(base_url, filename), dest/filename, entry.get('sha256'))
+        download(urllib.parse.urljoin(base_url, filename), dest/filename, hashes[name])
         print(f'Bundled {name}: {filename}')
     return dest
 
