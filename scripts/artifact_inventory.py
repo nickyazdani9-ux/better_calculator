@@ -52,7 +52,7 @@ def wheel_evidence(path, relative):
             dist_info_directories = set()
             total = 0
             for member in sorted(members, key=lambda entry: entry.filename):
-                name = member.filename
+                name = member.orig_filename
                 clean = name[:-1] if member.is_dir() else name
                 if (not clean or '\\' in name or ':' in name or '\x00' in name
                         or any(part in ('', '.', '..') for part in clean.split('/'))):

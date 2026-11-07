@@ -5,10 +5,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import warnings
 import zipfile
 
-from scripts.artifact_inventory import inventory
+from scripts.artifact_inventory import inventory, wheel_evidence
 
 
 REVISION = 'a' * 40
@@ -36,7 +37,14 @@ class ArtifactInventoryTests(unittest.TestCase):
                        ('synthetic/__init__.py', b'raise RuntimeError("do not execute")')]
         with zipfile.ZipFile(path, 'w') as archive:
             for name, data in entries:
-                archive.writestr(name, data)
+                # ZipInfo normalizes OS separators in its constructor on Windows.
+                # Preserve the exact adversarial spelling in the stored ZIP.
+                if isinstance(name, str):
+                    info = zipfile.ZipInfo(name)
+                    info.filename = name
+                    archive.writestr(info, data)
+                else:
+                    archive.writestr(name, data)
         return path
 
     def test_deterministic_sorted_files_and_supplied_revision(self):
@@ -142,6 +150,12 @@ class ArtifactInventoryTests(unittest.TestCase):
                 self.wheel([(name, b'not extracted')])
                 with self.assertRaisesRegex(ValueError, 'Unsafe'):
                     inventory(self.root, REVISION)
+
+    def test_original_zip_name_checked_under_windows_normalization(self):
+        path = self.wheel([('a\\b', b'not extracted')])
+        with patch('zipfile.os.sep', '\\'):
+            with self.assertRaisesRegex(ValueError, 'Unsafe'):
+                wheel_evidence(path, path.name)
 
     def test_archive_duplicates_rejected(self):
         with warnings.catch_warnings():

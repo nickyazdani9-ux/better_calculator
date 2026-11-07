@@ -105,3 +105,17 @@ pending at this commit. This is implemented and locally tested, not deployed
 or paid-validated. Next: inspect successful hosted manifest, reconcile its
 actual wheel/runtime/font notices and upstream sources; retain separate native
 CAS, signing and payment gates.
+
+## Windows CI correction
+
+Run42371999933 passed three unit platforms but failed the Windows unsafe ZIP
+name subtest (job128401865265): ZipInfo normalizes backslashes on Windows.
+The fixture now writes the literal adversarial member spelling; the validator
+checks orig_filename before platform normalization instead of filename.
+An additional test simulates Windows normalization on every test platform.
+The corrected full local suite passes **188 tests plus10 subtests**; see
+artifact-inventory-portable-python.txt. The21 inventory tests include the new
+regression. Production runtime and JS remain unchanged. This supersedes the
+initial local-only count above for the corrected head. Hosted rerun pending.
+
+Failure evidence: https://github.com/nickyazdani9-ux/better_calculator/actions/runs/42371999933/job/128401865265
