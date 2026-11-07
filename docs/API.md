@@ -65,7 +65,7 @@ Initialization/loading is asynchronous. This Worker protocol is **internal and s
 - `expression`: formula string for scalar / scalar field.
 - `components`: formula string of a list with one component per coordinate, for `vector` or `covector`; `coordinates` is required.
 - `matrix`: formula string of a rectangular list of lists, for `matrix` (up to 4×4).
-- `coordinates`: optional list of 1–4 distinct real coordinate names or comma-separated string.
+- `coordinates`: optional list of 1–4 distinct real coordinate names or comma-separated string. Coordinate and operation-variable names cannot be reserved constants (including `e`) or registered functions such as `sin`; use a name such as `x`, `u`, or `theta`.
 - `metric`: optional matrix string; must match coordinates, be symmetric, nondegenerate, with provably real entries. The engine does not insert a metric for you.
 - `tensor2` cannot be directly defined with this command; produce it using `tensor_product`.
 
