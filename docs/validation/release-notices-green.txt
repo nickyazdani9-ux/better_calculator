@@ -1,0 +1,12 @@
+✔ release artifact preserves exact project and dependency notices (77.641509ms)
+✔ release refuses missing LICENSE (58.131044ms)
+✔ release refuses missing node_modules/katex/LICENSE (56.439944ms)
+✔ release refuses missing licenses/PYODIDE-LICENSE (60.459089ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 330.654543

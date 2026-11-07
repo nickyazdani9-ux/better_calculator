@@ -10,8 +10,8 @@ It provides a five-minute [getting started guide](docs/GETTING_STARTED.md),
 a [generated reference of all legacy tab operations](docs/LEGACY_API.md),
 and [executable cross-domain recipes](docs/RECIPES.md).
 
-The unified workspace currently has an **experimental, engine-only API**;
-the existing tabbed UI still uses the legacy API. Documentation and examples
+The unified workspace has an **experimental visible interface and typed API**;
+the existing calculator tabs still use the legacy API. Documentation and examples
 are tested with the code and will continue evolving.
 
 
@@ -109,7 +109,7 @@ If additional dependencies are required in Pyodide, amend `scripts/vendor_pyodid
 
 MIT licensed; see [LICENSE](LICENSE).
 
-## Unified mathematical workspace (engine-only preview)
+## Unified mathematical workspace (experimental preview)
 
 A typed mathematical graph is now available through the existing JSON CAS boundary
 with `{"action":"workspace"}`. It permits cross-domain chains with reusable in-worker object references, versioned JSON snapshot export/import,

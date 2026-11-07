@@ -1,0 +1,74 @@
+✖ release artifact preserves exact project and dependency notices (67.217373ms)
+✖ release refuses missing LICENSE (68.632096ms)
+✖ release refuses missing node_modules/katex/LICENSE (61.815138ms)
+✖ release refuses missing licenses/PYODIDE-LICENSE (67.219156ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 336.144881
+
+✖ failing tests:
+
+test at tests/test_release_notices.mjs:20:1
+✖ release artifact preserves exact project and dependency notices (67.217373ms)
+  Error: ENOENT: no such file or directory, open '/tmp/calculator-notices-ev8Hh3/dist/LICENSE'
+      at async open (node:internal/fs/promises:1345:25)
+      at async readFile (node:internal/fs/promises:2003:14)
+      at async file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:22:226
+      at async fixture (file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:16:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/tmp/calculator-notices-ev8Hh3/dist/LICENSE'
+  }
+
+test at tests/test_release_notices.mjs:24:91
+✖ release refuses missing LICENSE (68.632096ms)
+  AssertionError [ERR_ASSERTION]: missing notice must fail release build
+      at file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:25:66
+      at async fixture (file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:16:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/test_release_notices.mjs:24:91
+✖ release refuses missing node_modules/katex/LICENSE (61.815138ms)
+  AssertionError [ERR_ASSERTION]: missing notice must fail release build
+      at file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:25:66
+      at async fixture (file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:16:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/test_release_notices.mjs:24:91
+✖ release refuses missing licenses/PYODIDE-LICENSE (67.219156ms)
+  AssertionError [ERR_ASSERTION]: missing notice must fail release build
+      at file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:25:66
+      at async fixture (file:///workspace/scratch/05bb5f9204c1/calculator-notices/tests/test_release_notices.mjs:16:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
